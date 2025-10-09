@@ -33,7 +33,7 @@ function RootLayoutNav() {
     } else if (isAuthenticated && !inTabs) {
       router.replace('/(tabs)');
     }
-  }, [isOnboardingCompleted, isAuthenticated, onboardingLoading, authLoading, segments, router]);
+  }, [isOnboardingCompleted, isAuthenticated, onboardingLoading, authLoading]);
 
   return (
     <Stack screenOptions={{ headerBackTitle: 'Voltar' }}>
