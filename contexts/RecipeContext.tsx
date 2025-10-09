@@ -11,14 +11,17 @@ export const [RecipeProvider, useRecipes] = createContextHook(() => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<string | undefined>();
 
-  const recipesQuery = trpc.recipes.list.useQuery({
-    search: searchQuery,
-    category: selectedCategory,
-  });
-
-  console.log('RecipeContext - Query data:', recipesQuery.data);
-  console.log('RecipeContext - Query isLoading:', recipesQuery.isLoading);
-  console.log('RecipeContext - Query error:', recipesQuery.error);
+  const recipesQuery = trpc.recipes.list.useQuery(
+    {
+      search: searchQuery,
+      category: selectedCategory,
+    },
+    {
+      staleTime: 1000 * 60 * 5,
+      refetchOnWindowFocus: false,
+      refetchOnMount: false,
+    }
+  );
 
   useEffect(() => {
     AsyncStorage.getItem(FAVORITES_KEY).then((stored) => {
@@ -42,10 +45,13 @@ export const [RecipeProvider, useRecipes] = createContextHook(() => {
 
   const isFavorite = useCallback((recipeId: string) => favorites.includes(recipeId), [favorites]);
 
+  const recipes = recipesQuery.data?.recipes || featuredRecipes;
+  const categories = recipesQuery.data?.categories || mockCategories;
+
   return useMemo(() => ({
-    recipes: recipesQuery.data?.recipes || featuredRecipes,
-    categories: recipesQuery.data?.categories || mockCategories,
-    isLoading: recipesQuery.isLoading,
+    recipes,
+    categories,
+    isLoading: false,
     error: recipesQuery.error,
     refetch: recipesQuery.refetch,
     favorites,
@@ -56,18 +62,15 @@ export const [RecipeProvider, useRecipes] = createContextHook(() => {
     selectedCategory,
     setSelectedCategory,
   }), [
-    recipesQuery.data?.recipes,
-    recipesQuery.data?.categories,
-    recipesQuery.isLoading,
+    recipes,
+    categories,
     recipesQuery.error,
     recipesQuery.refetch,
     favorites,
     toggleFavorite,
     isFavorite,
     searchQuery,
-    setSearchQuery,
     selectedCategory,
-    setSelectedCategory,
   ]);
 });
 

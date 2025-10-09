@@ -57,7 +57,10 @@ export default function OnboardingQuiz() {
       : answers;
     
     await completeOnboarding(finalAnswers);
-    router.replace('/auth');
+    
+    setTimeout(() => {
+      router.replace('/auth');
+    }, 100);
   };
 
   const handleSingleChoice = (option: string) => {

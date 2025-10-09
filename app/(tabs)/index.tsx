@@ -8,7 +8,6 @@ import {
   Image,
   Dimensions,
   TextInput,
-  ActivityIndicator,
 } from 'react-native';
 import { Search, Clock, Flame, Heart, ChefHat, Sparkles, Coffee, Utensils, Moon, Cake, Sandwich, GlassWater } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -26,7 +25,6 @@ export default function HomeScreen() {
   const {
     recipes,
     categories,
-    isLoading,
     toggleFavorite,
     isFavorite,
     searchQuery,
@@ -36,10 +34,6 @@ export default function HomeScreen() {
   } = useRecipes();
   const [searchFocused, setSearchFocused] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
-
-  console.log('HomeScreen - Recipes count:', recipes.length);
-  console.log('HomeScreen - Categories count:', categories.length);
-  console.log('HomeScreen - Is loading:', isLoading);
 
   return (
     <View style={styles.container}>
@@ -163,12 +157,7 @@ export default function HomeScreen() {
           </ScrollView>
         </View>
 
-        {isLoading ? (
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color={Colors.primary} />
-            <Text style={styles.loadingText}>Carregando receitas...</Text>
-          </View>
-        ) : recipes.length === 0 ? (
+        {recipes.length === 0 ? (
           <View style={styles.emptyContainer}>
             <Text style={styles.emptyText}>Nenhuma receita encontrada</Text>
             <Text style={styles.emptySubtext}>Tente ajustar os filtros de busca</Text>

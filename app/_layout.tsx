@@ -28,9 +28,7 @@ function RootLayoutNav() {
 
     if (!isOnboardingCompleted && !inOnboarding) {
       router.replace('/onboarding-welcome');
-    } else if (isOnboardingCompleted && !isAuthenticated && !inAuth && !inOnboarding) {
-      router.replace('/auth');
-    } else if (isOnboardingCompleted && inOnboarding) {
+    } else if (isOnboardingCompleted && !isAuthenticated && !inAuth) {
       router.replace('/auth');
     } else if (isAuthenticated && !inTabs) {
       router.replace('/(tabs)');
