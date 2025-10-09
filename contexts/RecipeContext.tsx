@@ -43,10 +43,11 @@ export const [RecipeProvider, useRecipes] = createContextHook(() => {
       setSearchQuery,
       selectedCategory,
       setSelectedCategory,
+      favorites,
       toggleFavorite,
       isFavorite,
       isLoading: recipesQuery.isLoading,
       error: recipesQuery.error,
     };
-  }, [recipesQuery.data, searchQuery, selectedCategory, toggleFavorite, isFavorite, recipesQuery.isLoading, recipesQuery.error]);
+  }, [recipesQuery.data, searchQuery, selectedCategory, favorites, toggleFavorite, isFavorite, recipesQuery.isLoading, recipesQuery.error]);
 });
