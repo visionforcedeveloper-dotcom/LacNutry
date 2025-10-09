@@ -1,6 +1,6 @@
 import { publicProcedure } from "../../../create-context";
 import { z } from "zod";
-import { generateObject } from "@rork/toolkit-sdk";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const recipeSchema = z.object({
   title: z.string(),
@@ -45,11 +45,10 @@ Preferências:
 `
       : "";
 
-    const recipe = await generateObject({
-      messages: [
-        {
-          role: "user",
-          content: `Você é um chef especializado em receitas sem lactose. Crie uma receita deliciosa e 100% sem lactose baseada nesta solicitação:
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+    const prompt = `Você é um chef especializado em receitas sem lactose. Crie uma receita deliciosa e 100% sem lactose baseada nesta solicitação:
 
 ${input.prompt}
 
@@ -61,11 +60,39 @@ IMPORTANTE:
 - Seja criativo e detalhado
 - Inclua informações nutricionais aproximadas
 - As instruções devem ser claras e fáceis de seguir
-- Adicione a tag "Sem Lactose" nas tags`,
-        },
-      ],
-      schema: recipeSchema,
-    });
+- Adicione a tag "Sem Lactose" nas tags
+
+Retorne um JSON com esta estrutura:
+{
+  "title": "Nome da receita",
+  "description": "Descrição",
+  "prepTime": número em minutos,
+  "servings": número de porções,
+  "difficulty": "Fácil" | "Médio" | "Difícil",
+  "category": "categoria",
+  "tags": ["array", "de", "tags"],
+  "ingredients": ["array", "de", "ingredientes"],
+  "instructions": ["array", "de", "passos"],
+  "nutritionInfo": {
+    "calories": número,
+    "protein": número em gramas,
+    "carbs": número em gramas,
+    "fat": número em gramas
+  }
+}
+
+Retorne APENAS o JSON, sem texto adicional.`;
+
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
+    
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      throw new Error("Não foi possível extrair JSON da resposta");
+    }
+
+    const recipe = recipeSchema.parse(JSON.parse(jsonMatch[0]));
 
     return {
       ...recipe,

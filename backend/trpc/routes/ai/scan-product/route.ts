@@ -1,6 +1,6 @@
 import { publicProcedure } from "../../../create-context";
 import { z } from "zod";
-import { generateObject } from "@rork/toolkit-sdk";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const scanResultSchema = z.object({
   productName: z.string(),
@@ -20,39 +20,46 @@ export const scanProductProcedure = publicProcedure
     })
   )
   .mutation(async ({ input }) => {
-    const result = await generateObject({
-      messages: [
-        {
-          role: "user",
-          content: [
-            {
-              type: "text",
-              text: `Analise esta imagem de produto alimentício e identifique:
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-1. Nome do produto
-2. Se contém lactose ou derivados de leite
-3. Nível de lactose (none/low/medium/high)
-4. Liste TODOS os ingredientes que contêm lactose encontrados
-5. Se é seguro para pessoas com intolerância à lactose
-6. Sugestões de alternativas sem lactose
-7. Avisos importantes (se houver)
-8. Nível de confiança da análise (0-100%)
+    const imageData = input.image.replace(/^data:image\/\w+;base64,/, "");
+
+    const prompt = `Analise esta imagem de produto alimentício e retorne um JSON com as seguintes informações:
+
+1. productName: Nome do produto
+2. hasLactose: Se contém lactose (true/false)
+3. lactoseLevel: Nível de lactose ("none", "low", "medium", "high")
+4. lactoseIngredients: Array com TODOS os ingredientes que contêm lactose
+5. safeForConsumption: Se é seguro para intolerantes à lactose (true/false)
+6. alternatives: Array com sugestões de alternativas sem lactose
+7. warning: Avisos importantes (opcional)
+8. confidence: Nível de confiança da análise (0-100)
 
 Ingredientes com lactose incluem: leite, lactose, soro de leite, whey, caseína, manteiga, queijo, iogurte, creme de leite, leite em pó, etc.
 
-Seja preciso e detalhado na análise.`,
-            },
-            {
-              type: "image",
-              image: input.image,
-            },
-          ],
-        },
-      ],
-      schema: scanResultSchema,
-    });
+Retorne APENAS o JSON, sem texto adicional.`;
 
-    return result;
+    const result = await model.generateContent([
+      prompt,
+      {
+        inlineData: {
+          data: imageData,
+          mimeType: "image/jpeg",
+        },
+      },
+    ]);
+
+    const response = await result.response;
+    const text = response.text();
+    
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      throw new Error("Não foi possível extrair JSON da resposta");
+    }
+
+    const parsedResult = JSON.parse(jsonMatch[0]);
+    return scanResultSchema.parse(parsedResult);
   });
 
 export default scanProductProcedure;
