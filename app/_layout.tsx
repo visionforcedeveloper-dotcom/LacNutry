@@ -23,13 +23,13 @@ function RootLayoutNav() {
     if (onboardingLoading || authLoading) return;
 
     const inOnboarding = segments[0] === 'onboarding-welcome' || segments[0] === 'onboarding-quiz';
+    const inLoading = segments[0] === 'quiz-loading';
+    const inPaywall = segments[0] === 'paywall';
     const inAuth = segments[0] === 'auth';
     const inTabs = segments[0] === '(tabs)';
 
-    if (!isOnboardingCompleted && !inOnboarding) {
+    if (!isOnboardingCompleted && !inOnboarding && !inLoading && !inPaywall && !inAuth) {
       router.replace('/onboarding-welcome');
-    } else if (isOnboardingCompleted && !isAuthenticated && !inAuth) {
-      router.replace('/auth');
     } else if (isAuthenticated && !inTabs) {
       router.replace('/(tabs)');
     }

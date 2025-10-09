@@ -5,14 +5,11 @@ import { Check, X, Sparkles, ChefHat, Camera, MessageCircle } from 'lucide-react
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import colors from '@/constants/colors';
-import { useAuth } from '@/contexts/AuthContext';
-
 type PlanType = 'monthly' | 'annual';
 
 export default function Paywall() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { completeSubscription } = useAuth();
   const [selectedPlan, setSelectedPlan] = useState<PlanType>('annual');
 
   const plans = {
@@ -55,8 +52,7 @@ export default function Paywall() {
 
   const handleSubscribe = async () => {
     try {
-      await completeSubscription();
-      router.replace('/(tabs)');
+      router.replace('/auth');
     } catch {
       Alert.alert('Erro', 'Não foi possível processar a assinatura. Tente novamente.');
     }
@@ -70,9 +66,8 @@ export default function Paywall() {
         { text: 'Cancelar', style: 'cancel' },
         {
           text: 'Continuar',
-          onPress: async () => {
-            await completeSubscription();
-            router.replace('/(tabs)');
+          onPress: () => {
+            router.replace('/auth');
           },
         },
       ]
