@@ -10,7 +10,7 @@ import {
   TextInput,
   ActivityIndicator,
 } from 'react-native';
-import { Search, Clock, Flame, Heart, ChefHat, Sparkles } from 'lucide-react-native';
+import { Search, Clock, Flame, Heart, ChefHat, Sparkles, Coffee, Utensils, Moon, Cake, Sandwich, GlassWater } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Colors from '@/constants/colors';
 import { Stack, useRouter } from 'expo-router';
@@ -62,7 +62,7 @@ export default function HomeScreen() {
               activeOpacity={0.8}
             >
               <LinearGradient
-                colors={['#667EEA', '#764BA2']}
+                colors={[Colors.primary, Colors.primaryDark]}
                 style={styles.aiToolGradient}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
@@ -78,7 +78,7 @@ export default function HomeScreen() {
               activeOpacity={0.8}
             >
               <LinearGradient
-                colors={['#F093FB', '#F5576C']}
+                colors={[Colors.primaryLight, Colors.primary]}
                 style={styles.aiToolGradient}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
@@ -113,29 +113,49 @@ export default function HomeScreen() {
             contentContainerStyle={styles.categoriesScroll}
           >
             <TouchableOpacity
-              style={[styles.categoryPill, !selectedCategory && styles.categoryPillActive]}
+              style={[styles.categoryChip, !selectedCategory && styles.categoryChipActive]}
               onPress={() => setSelectedCategory(undefined)}
             >
-              <Text style={[styles.categoryPillText, !selectedCategory && styles.categoryPillTextActive]}>
+              <View style={[styles.categoryIconContainer, !selectedCategory && styles.categoryIconContainerActive]}>
+                <Heart size={16} color={!selectedCategory ? Colors.surface : Colors.primary} strokeWidth={2.5} />
+              </View>
+              <Text style={[styles.categoryChipText, !selectedCategory && styles.categoryChipTextActive]}>
                 Todas
               </Text>
             </TouchableOpacity>
-            {categories.map((category) => (
-              <TouchableOpacity
-                key={category.id}
-                style={[styles.categoryPill, selectedCategory === category.name && styles.categoryPillActive]}
-                onPress={() => setSelectedCategory(category.name)}
-              >
-                <Text
-                  style={[
-                    styles.categoryPillText,
-                    selectedCategory === category.name && styles.categoryPillTextActive,
-                  ]}
+            {categories.map((category) => {
+              const IconComponent = 
+                category.icon === 'coffee' ? Coffee :
+                category.icon === 'utensils' ? Utensils :
+                category.icon === 'moon' ? Moon :
+                category.icon === 'cake' ? Cake :
+                category.icon === 'sandwich' ? Sandwich :
+                GlassWater;
+              
+              return (
+                <TouchableOpacity
+                  key={category.id}
+                  style={[styles.categoryChip, selectedCategory === category.name && styles.categoryChipActive]}
+                  onPress={() => setSelectedCategory(category.name)}
                 >
-                  {category.name}
-                </Text>
-              </TouchableOpacity>
-            ))}
+                  <View style={[styles.categoryIconContainer, selectedCategory === category.name && styles.categoryIconContainerActive]}>
+                    <IconComponent 
+                      size={16} 
+                      color={selectedCategory === category.name ? Colors.surface : Colors.primary} 
+                      strokeWidth={2.5} 
+                    />
+                  </View>
+                  <Text
+                    style={[
+                      styles.categoryChipText,
+                      selectedCategory === category.name && styles.categoryChipTextActive,
+                    ]}
+                  >
+                    {category.name}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
           </ScrollView>
         </View>
 
@@ -373,26 +393,40 @@ const styles = StyleSheet.create({
   },
   categoriesScroll: {
     paddingHorizontal: 24,
-    gap: 8,
+    gap: 10,
   },
-  categoryPill: {
-    paddingHorizontal: 18,
+  categoryChip: {
+    flexDirection: 'row' as const,
+    alignItems: 'center' as const,
+    paddingHorizontal: 14,
     paddingVertical: 8,
-    borderRadius: 16,
+    borderRadius: 20,
     backgroundColor: Colors.surface,
     borderWidth: 1.5,
     borderColor: Colors.border,
+    gap: 6,
   },
-  categoryPillActive: {
+  categoryChipActive: {
     backgroundColor: Colors.primary,
     borderColor: Colors.primary,
   },
-  categoryPillText: {
+  categoryIconContainer: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: Colors.secondary,
+    alignItems: 'center' as const,
+    justifyContent: 'center' as const,
+  },
+  categoryIconContainerActive: {
+    backgroundColor: 'rgba(255,255,255,0.25)',
+  },
+  categoryChipText: {
     fontSize: 13,
     fontWeight: '600' as const,
     color: Colors.text.secondary,
   },
-  categoryPillTextActive: {
+  categoryChipTextActive: {
     fontSize: 13,
     fontWeight: '700' as const,
     color: Colors.surface,
