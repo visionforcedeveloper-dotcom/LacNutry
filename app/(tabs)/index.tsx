@@ -33,7 +33,6 @@ export default function HomeScreen() {
     setSelectedCategory,
   } = useRecipes();
   const [searchFocused, setSearchFocused] = useState(false);
-  const [showDetails, setShowDetails] = useState(false);
 
   return (
     <View style={styles.container}>
@@ -177,7 +176,7 @@ export default function HomeScreen() {
                 key={recipe.id} 
                 style={styles.featuredCard} 
                 activeOpacity={0.9}
-                onPress={() => setShowDetails(!showDetails)}
+                onPress={() => router.push(`/recipe-detail?id=${recipe.id}`)}
               >
                 <Image
                   source={{ uri: recipe.image }}
@@ -207,23 +206,19 @@ export default function HomeScreen() {
                     <Text style={styles.featuredTitle} numberOfLines={2}>
                       {recipe.title}
                     </Text>
-                    {showDetails && (
-                      <>
-                        <Text style={styles.featuredDescription} numberOfLines={2}>
-                          {recipe.description}
-                        </Text>
-                        <View style={styles.featuredFooter}>
-                          <View style={styles.featuredBadge}>
-                            <Clock size={12} color={Colors.surface} strokeWidth={2} />
-                            <Text style={styles.featuredBadgeText}>{recipe.prepTime}min</Text>
-                          </View>
-                          <View style={styles.featuredBadge}>
-                            <Flame size={12} color={Colors.surface} strokeWidth={2} />
-                            <Text style={styles.featuredBadgeText}>{recipe.nutritionInfo?.calories}cal</Text>
-                          </View>
-                        </View>
-                      </>
-                    )}
+                    <Text style={styles.featuredDescription} numberOfLines={2}>
+                      {recipe.description}
+                    </Text>
+                    <View style={styles.featuredFooter}>
+                      <View style={styles.featuredBadge}>
+                        <Clock size={12} color={Colors.surface} strokeWidth={2} />
+                        <Text style={styles.featuredBadgeText}>{recipe.prepTime}min</Text>
+                      </View>
+                      <View style={styles.featuredBadge}>
+                        <Flame size={12} color={Colors.surface} strokeWidth={2} />
+                        <Text style={styles.featuredBadgeText}>{recipe.nutritionInfo?.calories}cal</Text>
+                      </View>
+                    </View>
                   </View>
                 </LinearGradient>
               </TouchableOpacity>
@@ -242,7 +237,7 @@ export default function HomeScreen() {
                 key={recipe.id} 
                 style={styles.recipeCard} 
                 activeOpacity={0.9}
-                onPress={() => setShowDetails(!showDetails)}
+                onPress={() => router.push(`/recipe-detail?id=${recipe.id}`)}
               >
                 <Image
                   source={{ uri: recipe.image }}
@@ -268,18 +263,16 @@ export default function HomeScreen() {
                   <Text style={styles.recipeTitle} numberOfLines={2}>
                     {recipe.title}
                   </Text>
-                  {showDetails && (
-                    <View style={styles.recipeFooter}>
-                      <View style={styles.recipeInfo}>
-                        <Clock size={12} color={Colors.text.tertiary} strokeWidth={2} />
-                        <Text style={styles.recipeInfoText}>{recipe.prepTime}min</Text>
-                      </View>
-                      <View style={styles.recipeInfo}>
-                        <Flame size={12} color={Colors.text.tertiary} strokeWidth={2} />
-                        <Text style={styles.recipeInfoText}>{recipe.nutritionInfo?.calories}</Text>
-                      </View>
+                  <View style={styles.recipeFooter}>
+                    <View style={styles.recipeInfo}>
+                      <Clock size={12} color={Colors.text.tertiary} strokeWidth={2} />
+                      <Text style={styles.recipeInfoText}>{recipe.prepTime}min</Text>
                     </View>
-                  )}
+                    <View style={styles.recipeInfo}>
+                      <Flame size={12} color={Colors.text.tertiary} strokeWidth={2} />
+                      <Text style={styles.recipeInfoText}>{recipe.nutritionInfo?.calories}</Text>
+                    </View>
+                  </View>
                 </View>
               </TouchableOpacity>
                 ))}

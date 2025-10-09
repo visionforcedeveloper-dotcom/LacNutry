@@ -43,6 +43,7 @@ function RootLayoutNav() {
       <Stack.Screen name="paywall" options={{ headerShown: false }} />
       <Stack.Screen name="auth" options={{ headerShown: false }} />
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      <Stack.Screen name="recipe-detail" options={{ headerShown: false, presentation: 'card' }} />
     </Stack>
   );
 }

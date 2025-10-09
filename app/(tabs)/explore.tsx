@@ -10,13 +10,14 @@ import {
 } from 'react-native';
 import { Heart, Clock, Flame } from 'lucide-react-native';
 import Colors from '@/constants/colors';
-import { Stack } from 'expo-router';
+import { Stack, useRouter } from 'expo-router';
 import { useRecipes } from '@/contexts/RecipeContext';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = (width - 60) / 2;
 
 export default function FavoritesScreen() {
+  const router = useRouter();
   const { recipes, toggleFavorite, isFavorite } = useRecipes();
   const favoriteRecipes = recipes.filter(recipe => isFavorite(recipe.id));
 
@@ -52,6 +53,7 @@ export default function FavoritesScreen() {
                 key={recipe.id} 
                 style={styles.recipeCard} 
                 activeOpacity={0.9}
+                onPress={() => router.push(`/recipe-detail?id=${recipe.id}`)}
               >
                 <Image
                   source={{ uri: recipe.image }}
