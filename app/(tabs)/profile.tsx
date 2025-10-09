@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  Alert,
+  Switch,
 } from 'react-native';
 import {
   User,
@@ -16,38 +18,108 @@ import {
   Star,
   Award,
   LogOut,
+  CreditCard,
+  Settings,
 } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useRouter } from 'expo-router';
 import Colors from '@/constants/colors';
 import { useOnboarding } from '@/contexts/OnboardingContext';
+import { useRecipes } from '@/contexts/RecipeContext';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function ProfileScreen() {
+  const router = useRouter();
   const { getUserName, resetOnboarding } = useOnboarding();
+  const { favorites, recipes } = useRecipes();
+  const { user, signOut } = useAuth();
+  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  
+  const handleLogout = async () => {
+    Alert.alert(
+      'Sair',
+      'Deseja realmente sair da sua conta?',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: 'Sair',
+          style: 'destructive',
+          onPress: async () => {
+            await signOut();
+            router.replace('/auth');
+          },
+        },
+      ]
+    );
+  };
+
+  const handleResetQuiz = () => {
+    Alert.alert(
+      'Refazer Quiz',
+      'Isso irá resetar suas preferências. Deseja continuar?',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: 'Continuar',
+          onPress: () => {
+            resetOnboarding();
+            router.replace('/onboarding-welcome');
+          },
+        },
+      ]
+    );
+  };
+
+  const handleEditProfile = () => {
+    Alert.alert('Em breve', 'Funcionalidade de edição de perfil em desenvolvimento');
+  };
+
+  const handleSubscription = () => {
+    Alert.alert('Assinatura Ativa', 'Você tem acesso premium até 2026');
+  };
+
+  const handlePrivacy = () => {
+    Alert.alert('Privacidade', 'Seus dados estão protegidos e criptografados');
+  };
+
+  const handleHelp = () => {
+    Alert.alert('Ajuda', 'Entre em contato: suporte@lacnutry.com');
+  };
   
   const menuItems = [
     {
       icon: Heart,
       title: 'Receitas Favoritas',
-      subtitle: '12 receitas salvas',
+      subtitle: `${favorites.length} receitas salvas`,
       color: '#FC8181',
+      onPress: () => {
+        if (favorites.length > 0) {
+          Alert.alert('Favoritos', `Você tem ${favorites.length} receitas favoritas`);
+        } else {
+          Alert.alert('Favoritos', 'Você ainda não tem receitas favoritas');
+        }
+      },
     },
     {
-      icon: Bell,
-      title: 'Notificações',
-      subtitle: 'Gerenciar alertas',
-      color: '#F6AD55',
+      icon: CreditCard,
+      title: 'Assinatura',
+      subtitle: 'Plano Premium Ativo',
+      color: '#48BB78',
+      onPress: handleSubscription,
     },
     {
       icon: Shield,
       title: 'Privacidade',
       subtitle: 'Configurações de dados',
       color: '#9F7AEA',
+      onPress: handlePrivacy,
     },
     {
       icon: HelpCircle,
       title: 'Ajuda & Suporte',
       subtitle: 'Central de ajuda',
       color: '#4299E1',
+      onPress: handleHelp,
     },
   ];
 
@@ -69,42 +141,86 @@ export default function ProfileScreen() {
           </LinearGradient>
 
           <Text style={styles.userName}>{getUserName()}</Text>
-          <Text style={styles.userEmail}>Membro desde 2025</Text>
+          <Text style={styles.userEmail}>{user?.email || 'Membro desde 2025'}</Text>
 
-          <TouchableOpacity style={styles.editButton} activeOpacity={0.7}>
+          <TouchableOpacity 
+            style={styles.editButton} 
+            activeOpacity={0.7}
+            onPress={handleEditProfile}
+          >
             <Text style={styles.editButtonText}>Editar Perfil</Text>
           </TouchableOpacity>
         </View>
 
         <View style={styles.statsContainer}>
-          <View style={styles.statItem}>
+          <TouchableOpacity 
+            style={styles.statItem}
+            activeOpacity={0.7}
+            onPress={() => {
+              if (favorites.length > 0) {
+                Alert.alert('Favoritos', `Você tem ${favorites.length} receitas favoritas`);
+              } else {
+                Alert.alert('Favoritos', 'Você ainda não tem receitas favoritas');
+              }
+            }}
+          >
             <View style={[styles.statIconContainer, { backgroundColor: '#FC8181' + '20' }]}>
               <Heart size={24} color="#FC8181" strokeWidth={2} />
             </View>
-            <Text style={styles.statValue}>12</Text>
+            <Text style={styles.statValue}>{favorites.length}</Text>
             <Text style={styles.statLabel}>Favoritas</Text>
-          </View>
+          </TouchableOpacity>
 
-          <View style={styles.statItem}>
+          <TouchableOpacity 
+            style={styles.statItem}
+            activeOpacity={0.7}
+            onPress={() => Alert.alert('Receitas', `${recipes.length} receitas disponíveis`)}
+          >
             <View style={[styles.statIconContainer, { backgroundColor: '#F6AD55' + '20' }]}>
               <Star size={24} color="#F6AD55" strokeWidth={2} />
             </View>
-            <Text style={styles.statValue}>28</Text>
+            <Text style={styles.statValue}>{recipes.length}</Text>
             <Text style={styles.statLabel}>Receitas</Text>
-          </View>
+          </TouchableOpacity>
 
-          <View style={styles.statItem}>
+          <TouchableOpacity 
+            style={styles.statItem}
+            activeOpacity={0.7}
+            onPress={() => Alert.alert('Conquistas', 'Continue usando o app para desbloquear conquistas!')}
+          >
             <View style={[styles.statIconContainer, { backgroundColor: '#9F7AEA' + '20' }]}>
               <Award size={24} color="#9F7AEA" strokeWidth={2} />
             </View>
             <Text style={styles.statValue}>5</Text>
             <Text style={styles.statLabel}>Conquistas</Text>
-          </View>
+          </TouchableOpacity>
         </View>
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Configurações</Text>
           <View style={styles.menuContainer}>
+            <View style={styles.menuItem}>
+              <View
+                style={[
+                  styles.menuIcon,
+                  { backgroundColor: '#F6AD55' + '20' },
+                ]}
+              >
+                <Bell size={24} color="#F6AD55" strokeWidth={2} />
+              </View>
+              <View style={styles.menuContent}>
+                <Text style={styles.menuTitle}>Notificações</Text>
+                <Text style={styles.menuSubtitle}>
+                  {notificationsEnabled ? 'Ativadas' : 'Desativadas'}
+                </Text>
+              </View>
+              <Switch
+                value={notificationsEnabled}
+                onValueChange={setNotificationsEnabled}
+                trackColor={{ false: Colors.border, true: Colors.primary }}
+                thumbColor={Colors.surface}
+              />
+            </View>
             {menuItems.map((item, index) => {
               const IconComponent = item.icon;
               return (
@@ -112,6 +228,7 @@ export default function ProfileScreen() {
                   key={index}
                   style={styles.menuItem}
                   activeOpacity={0.7}
+                  onPress={item.onPress}
                 >
                   <View
                     style={[
@@ -133,12 +250,21 @@ export default function ProfileScreen() {
         </View>
 
         <TouchableOpacity 
+          style={styles.resetButton} 
+          activeOpacity={0.7}
+          onPress={handleResetQuiz}
+        >
+          <Settings size={18} color={Colors.primary} strokeWidth={2} />
+          <Text style={styles.resetText}>Refazer Quiz</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity 
           style={styles.logoutButton} 
           activeOpacity={0.7}
-          onPress={resetOnboarding}
+          onPress={handleLogout}
         >
           <LogOut size={18} color={Colors.error} strokeWidth={2} />
-          <Text style={styles.logoutText}>Refazer Quiz</Text>
+          <Text style={styles.logoutText}>Sair da Conta</Text>
         </TouchableOpacity>
 
         <Text style={styles.version}>Versão 1.0.0</Text>
@@ -283,6 +409,24 @@ const styles = StyleSheet.create({
   menuSubtitle: {
     fontSize: 14,
     color: Colors.text.tertiary,
+  },
+  resetButton: {
+    marginHorizontal: 20,
+    paddingVertical: 14,
+    flexDirection: 'row' as const,
+    alignItems: 'center' as const,
+    justifyContent: 'center' as const,
+    gap: 8,
+    borderRadius: 12,
+    backgroundColor: Colors.surface,
+    borderWidth: 1.5,
+    borderColor: Colors.primary,
+    marginBottom: 12,
+  },
+  resetText: {
+    fontSize: 15,
+    fontWeight: '600' as const,
+    color: Colors.primary,
   },
   logoutButton: {
     marginHorizontal: 20,
