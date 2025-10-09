@@ -14,28 +14,28 @@ export const [OnboardingProvider, useOnboarding] = createContextHook(() => {
   const [quizAnswers, setQuizAnswers] = useState<QuizAnswers>({});
   const [isLoading, setIsLoading] = useState(true);
 
-  const loadOnboardingStatus = useCallback(async () => {
-    try {
-      const [completed, answers] = await Promise.all([
-        AsyncStorage.getItem(ONBOARDING_KEY),
-        AsyncStorage.getItem(QUIZ_ANSWERS_KEY),
-      ]);
-      
-      setIsOnboardingCompleted(completed === 'true');
-      if (answers) {
-        setQuizAnswers(JSON.parse(answers));
-      }
-    } catch (error) {
-      console.error('Error loading onboarding status:', error);
-      setIsOnboardingCompleted(false);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
   useEffect(() => {
+    const loadOnboardingStatus = async () => {
+      try {
+        const [completed, answers] = await Promise.all([
+          AsyncStorage.getItem(ONBOARDING_KEY),
+          AsyncStorage.getItem(QUIZ_ANSWERS_KEY),
+        ]);
+        
+        setIsOnboardingCompleted(completed === 'true');
+        if (answers) {
+          setQuizAnswers(JSON.parse(answers));
+        }
+      } catch (error) {
+        console.error('Error loading onboarding status:', error);
+        setIsOnboardingCompleted(false);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
     loadOnboardingStatus();
-  }, [loadOnboardingStatus]);
+  }, []);
 
   const completeOnboarding = useCallback(async (answers: QuizAnswers) => {
     try {
