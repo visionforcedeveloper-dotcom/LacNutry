@@ -10,16 +10,19 @@ import {
   TextInput,
   ActivityIndicator,
 } from 'react-native';
-import { Search, Clock, Flame, Heart, Leaf, Wheat } from 'lucide-react-native';
+import { Search, Clock, Flame, Heart, ChefHat, Sparkles } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Colors from '@/constants/colors';
-import { Stack } from 'expo-router';
+import { Stack, useRouter } from 'expo-router';
 import { useRecipes } from '@/contexts/RecipeContext';
+import { useOnboarding } from '@/contexts/OnboardingContext';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = (width - 60) / 2;
 
 export default function HomeScreen() {
+  const router = useRouter();
+  const { getUserName } = useOnboarding();
   const {
     recipes,
     categories,
@@ -32,6 +35,7 @@ export default function HomeScreen() {
     setSelectedCategory,
   } = useRecipes();
   const [searchFocused, setSearchFocused] = useState(false);
+  const [showDetails, setShowDetails] = useState(false);
 
   return (
     <View style={styles.container}>
@@ -43,9 +47,46 @@ export default function HomeScreen() {
       >
         <View style={styles.header}>
           <View>
-            <Text style={styles.greeting}>Olá! 👋</Text>
+            <Text style={styles.greeting}>Olá, {getUserName()}! 👋</Text>
             <Text style={styles.title}>LacNutry</Text>
             <Text style={styles.subtitle}>Receitas deliciosas sem lactose</Text>
+          </View>
+        </View>
+
+        <View style={styles.aiToolsSection}>
+          <Text style={styles.aiToolsTitle}>Ferramentas IA</Text>
+          <View style={styles.aiToolsGrid}>
+            <TouchableOpacity 
+              style={styles.aiToolCard}
+              onPress={() => router.push('/recipe-generator')}
+              activeOpacity={0.8}
+            >
+              <LinearGradient
+                colors={['#667EEA', '#764BA2']}
+                style={styles.aiToolGradient}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+              >
+                <ChefHat size={28} color="#FFFFFF" strokeWidth={2} />
+                <Text style={styles.aiToolText}>Gerador de{"\n"}Receitas</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+              style={styles.aiToolCard}
+              onPress={() => router.push('/nutritionist-chat')}
+              activeOpacity={0.8}
+            >
+              <LinearGradient
+                colors={['#F093FB', '#F5576C']}
+                style={styles.aiToolGradient}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+              >
+                <Sparkles size={28} color="#FFFFFF" strokeWidth={2} />
+                <Text style={styles.aiToolText}>Nutricionista{"\n"}IA</Text>
+              </LinearGradient>
+            </TouchableOpacity>
           </View>
         </View>
 
@@ -63,7 +104,9 @@ export default function HomeScreen() {
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Categorias</Text>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Categorias</Text>
+          </View>
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -103,30 +146,40 @@ export default function HomeScreen() {
         ) : (
           <>
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Em Destaque</Text>
+              <View style={styles.sectionHeader}>
+                <Text style={styles.sectionTitle}>Em Destaque</Text>
+              </View>
               <ScrollView
                 horizontal
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={styles.featuredScroll}
               >
                 {recipes.slice(0, 3).map((recipe) => (
-              <TouchableOpacity key={recipe.id} style={styles.featuredCard} activeOpacity={0.9}>
+              <TouchableOpacity 
+                key={recipe.id} 
+                style={styles.featuredCard} 
+                activeOpacity={0.9}
+                onPress={() => setShowDetails(!showDetails)}
+              >
                 <Image
                   source={{ uri: recipe.image }}
                   style={styles.featuredImage}
                   resizeMode="cover"
                 />
                 <LinearGradient
-                  colors={['transparent', 'rgba(0,0,0,0.8)']}
+                  colors={['transparent', 'rgba(0,0,0,0.85)']}
                   style={styles.featuredGradient}
                 >
                   <TouchableOpacity
                     style={styles.heartButton}
-                    onPress={() => toggleFavorite(recipe.id)}
+                    onPress={(e) => {
+                      e.stopPropagation();
+                      toggleFavorite(recipe.id);
+                    }}
                     activeOpacity={0.7}
                   >
                     <Heart
-                      size={20}
+                      size={18}
                       color={Colors.surface}
                       strokeWidth={2.5}
                       fill={isFavorite(recipe.id) ? Colors.surface : 'transparent'}
@@ -136,19 +189,23 @@ export default function HomeScreen() {
                     <Text style={styles.featuredTitle} numberOfLines={2}>
                       {recipe.title}
                     </Text>
-                    <Text style={styles.featuredDescription} numberOfLines={1}>
-                      {recipe.description}
-                    </Text>
-                    <View style={styles.featuredFooter}>
-                      <View style={styles.featuredBadge}>
-                        <Clock size={14} color={Colors.surface} strokeWidth={2} />
-                        <Text style={styles.featuredBadgeText}>{recipe.prepTime} min</Text>
-                      </View>
-                      <View style={styles.featuredBadge}>
-                        <Flame size={14} color={Colors.surface} strokeWidth={2} />
-                        <Text style={styles.featuredBadgeText}>{recipe.nutritionInfo?.calories} cal</Text>
-                      </View>
-                    </View>
+                    {showDetails && (
+                      <>
+                        <Text style={styles.featuredDescription} numberOfLines={2}>
+                          {recipe.description}
+                        </Text>
+                        <View style={styles.featuredFooter}>
+                          <View style={styles.featuredBadge}>
+                            <Clock size={12} color={Colors.surface} strokeWidth={2} />
+                            <Text style={styles.featuredBadgeText}>{recipe.prepTime}min</Text>
+                          </View>
+                          <View style={styles.featuredBadge}>
+                            <Flame size={12} color={Colors.surface} strokeWidth={2} />
+                            <Text style={styles.featuredBadgeText}>{recipe.nutritionInfo?.calories}cal</Text>
+                          </View>
+                        </View>
+                      </>
+                    )}
                   </View>
                 </LinearGradient>
               </TouchableOpacity>
@@ -157,25 +214,33 @@ export default function HomeScreen() {
             </View>
 
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Todas as Receitas</Text>
+              <View style={styles.sectionHeader}>
+                <Text style={styles.sectionTitle}>Receitas</Text>
+                <Text style={styles.sectionCount}>{recipes.length}</Text>
+              </View>
               <View style={styles.recipesGrid}>
                 {recipes.map((recipe) => (
-              <TouchableOpacity key={recipe.id} style={styles.recipeCard} activeOpacity={0.9}>
+              <TouchableOpacity 
+                key={recipe.id} 
+                style={styles.recipeCard} 
+                activeOpacity={0.9}
+                onPress={() => setShowDetails(!showDetails)}
+              >
                 <Image
                   source={{ uri: recipe.image }}
                   style={styles.recipeImage}
                   resizeMode="cover"
                 />
-                <View style={styles.difficultyBadge}>
-                  <Text style={styles.difficultyText}>{recipe.difficulty}</Text>
-                </View>
                 <TouchableOpacity
                   style={styles.recipeLikeButton}
-                  onPress={() => toggleFavorite(recipe.id)}
+                  onPress={(e) => {
+                    e.stopPropagation();
+                    toggleFavorite(recipe.id);
+                  }}
                   activeOpacity={0.7}
                 >
                   <Heart
-                    size={18}
+                    size={16}
                     color={isFavorite(recipe.id) ? '#FF6B6B' : Colors.text.tertiary}
                     strokeWidth={2.5}
                     fill={isFavorite(recipe.id) ? '#FF6B6B' : 'transparent'}
@@ -185,30 +250,18 @@ export default function HomeScreen() {
                   <Text style={styles.recipeTitle} numberOfLines={2}>
                     {recipe.title}
                   </Text>
-                  <View style={styles.recipeFooter}>
-                    <View style={styles.recipeInfo}>
-                      <Clock size={14} color={Colors.text.tertiary} strokeWidth={2} />
-                      <Text style={styles.recipeInfoText}>{recipe.prepTime} min</Text>
-                    </View>
-                    <View style={styles.recipeInfo}>
-                      <Flame size={14} color={Colors.text.tertiary} strokeWidth={2} />
-                      <Text style={styles.recipeInfoText}>{recipe.nutritionInfo?.calories}</Text>
-                    </View>
-                  </View>
-                  <View style={styles.recipeTags}>
-                    {recipe.tags.includes('Vegano') && (
-                      <View style={styles.recipeTag}>
-                        <Leaf size={12} color={Colors.success} strokeWidth={2} />
-                        <Text style={styles.recipeTagText}>Vegano</Text>
+                  {showDetails && (
+                    <View style={styles.recipeFooter}>
+                      <View style={styles.recipeInfo}>
+                        <Clock size={12} color={Colors.text.tertiary} strokeWidth={2} />
+                        <Text style={styles.recipeInfoText}>{recipe.prepTime}min</Text>
                       </View>
-                    )}
-                    {recipe.tags.some(tag => tag.includes('Glúten')) && (
-                      <View style={styles.recipeTag}>
-                        <Wheat size={12} color={Colors.warning} strokeWidth={2} />
-                        <Text style={styles.recipeTagText}>S/ Glúten</Text>
+                      <View style={styles.recipeInfo}>
+                        <Flame size={12} color={Colors.text.tertiary} strokeWidth={2} />
+                        <Text style={styles.recipeInfoText}>{recipe.nutritionInfo?.calories}</Text>
                       </View>
-                    )}
-                  </View>
+                    </View>
+                  )}
                 </View>
               </TouchableOpacity>
                 ))}
@@ -233,36 +286,74 @@ const styles = StyleSheet.create({
     paddingBottom: 100,
   },
   header: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 24,
     paddingTop: 60,
-    paddingBottom: 20,
+    paddingBottom: 16,
   },
   greeting: {
-    fontSize: 16,
+    fontSize: 15,
     color: Colors.text.secondary,
-    marginBottom: 4,
+    marginBottom: 2,
+    fontWeight: '500' as const,
   },
   title: {
-    fontSize: 32,
+    fontSize: 28,
     fontWeight: '800' as const,
     color: Colors.primary,
     letterSpacing: -0.5,
+    marginBottom: 2,
   },
   subtitle: {
-    fontSize: 16,
-    color: Colors.text.secondary,
-    marginTop: 4,
+    fontSize: 14,
+    color: Colors.text.tertiary,
+  },
+  aiToolsSection: {
+    paddingHorizontal: 24,
+    marginTop: 20,
+    marginBottom: 8,
+  },
+  aiToolsTitle: {
+    fontSize: 18,
+    fontWeight: '700' as const,
+    color: Colors.text.primary,
+    marginBottom: 12,
+  },
+  aiToolsGrid: {
+    flexDirection: 'row' as const,
+    gap: 12,
+  },
+  aiToolCard: {
+    flex: 1,
+    height: 100,
+    borderRadius: 16,
+    overflow: 'hidden' as const,
+    shadowColor: Colors.shadow.color,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  aiToolGradient: {
+    flex: 1,
+    padding: 16,
+    justifyContent: 'space-between' as const,
+  },
+  aiToolText: {
+    fontSize: 13,
+    fontWeight: '700' as const,
+    color: '#FFFFFF',
+    lineHeight: 18,
   },
   searchBar: {
     flexDirection: 'row' as const,
     alignItems: 'center' as const,
     backgroundColor: '#F0F4F8',
-    marginHorizontal: 20,
+    marginHorizontal: 24,
     paddingHorizontal: 16,
-    paddingVertical: 14,
-    borderRadius: 16,
-    gap: 12,
-    borderWidth: 2,
+    paddingVertical: 12,
+    borderRadius: 14,
+    gap: 10,
+    borderWidth: 1.5,
     borderColor: 'transparent',
   },
   searchBarFocused: {
@@ -271,7 +362,7 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     flex: 1,
-    fontSize: 15,
+    fontSize: 14,
     color: Colors.text.primary,
   },
   loadingContainer: {
@@ -281,15 +372,15 @@ const styles = StyleSheet.create({
     paddingVertical: 60,
   },
   categoriesScroll: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 24,
     gap: 8,
   },
   categoryPill: {
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 20,
+    paddingHorizontal: 18,
+    paddingVertical: 8,
+    borderRadius: 16,
     backgroundColor: Colors.surface,
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: Colors.border,
   },
   categoryPillActive: {
@@ -297,35 +388,54 @@ const styles = StyleSheet.create({
     borderColor: Colors.primary,
   },
   categoryPillText: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '600' as const,
     color: Colors.text.secondary,
   },
   categoryPillTextActive: {
-    fontSize: 14,
-    fontWeight: '600' as const,
+    fontSize: 13,
+    fontWeight: '700' as const,
     color: Colors.surface,
   },
   section: {
-    marginTop: 28,
+    marginTop: 24,
+  },
+  sectionHeader: {
+    flexDirection: 'row' as const,
+    justifyContent: 'space-between' as const,
+    alignItems: 'center' as const,
+    paddingHorizontal: 24,
+    marginBottom: 12,
   },
   sectionTitle: {
-    fontSize: 24,
-    fontWeight: '800' as const,
+    fontSize: 20,
+    fontWeight: '700' as const,
     color: Colors.text.primary,
-    paddingHorizontal: 20,
-    marginBottom: 16,
+  },
+  sectionCount: {
+    fontSize: 14,
+    fontWeight: '600' as const,
+    color: Colors.text.tertiary,
+    backgroundColor: Colors.background,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
   },
   featuredScroll: {
-    paddingHorizontal: 20,
-    gap: 16,
+    paddingHorizontal: 24,
+    gap: 12,
   },
   featuredCard: {
-    width: width - 80,
-    height: 280,
-    borderRadius: 20,
+    width: width - 100,
+    height: 240,
+    borderRadius: 18,
     overflow: 'hidden' as const,
     backgroundColor: Colors.surface,
+    shadowColor: Colors.shadow.color,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.12,
+    shadowRadius: 12,
+    elevation: 5,
   },
   featuredImage: {
     width: '100%',
@@ -338,30 +448,31 @@ const styles = StyleSheet.create({
   },
   heartButton: {
     position: 'absolute' as const,
-    top: 16,
-    right: 16,
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(0,0,0,0.3)',
+    top: 12,
+    right: 12,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(0,0,0,0.4)',
     alignItems: 'center' as const,
     justifyContent: 'center' as const,
   },
   featuredContent: {
-    padding: 20,
+    padding: 16,
   },
   featuredTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '700' as const,
     color: Colors.surface,
-    marginBottom: 4,
-    lineHeight: 26,
+    lineHeight: 24,
   },
   featuredDescription: {
-    fontSize: 14,
+    fontSize: 13,
     color: Colors.surface,
-    opacity: 0.9,
-    marginBottom: 12,
+    opacity: 0.85,
+    marginTop: 6,
+    marginBottom: 10,
+    lineHeight: 18,
   },
   featuredFooter: {
     flexDirection: 'row' as const,
@@ -370,60 +481,47 @@ const styles = StyleSheet.create({
   featuredBadge: {
     flexDirection: 'row' as const,
     alignItems: 'center' as const,
-    backgroundColor: 'rgba(255,255,255,0.25)',
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 12,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 10,
     gap: 4,
   },
   featuredBadgeText: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '600' as const,
     color: Colors.surface,
   },
   recipesGrid: {
     flexDirection: 'row' as const,
     flexWrap: 'wrap' as const,
-    paddingHorizontal: 20,
-    gap: 16,
+    paddingHorizontal: 24,
+    gap: 12,
   },
   recipeCard: {
     width: CARD_WIDTH,
     backgroundColor: Colors.surface,
-    borderRadius: 16,
+    borderRadius: 14,
     overflow: 'hidden' as const,
     shadowColor: Colors.shadow.color,
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.08,
     shadowRadius: 8,
-    elevation: 3,
+    elevation: 2,
   },
   recipeImage: {
     width: '100%',
-    height: 140,
+    height: 130,
   },
-  difficultyBadge: {
-    position: 'absolute' as const,
-    top: 10,
-    left: 10,
-    backgroundColor: 'rgba(0,0,0,0.6)',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 8,
-  },
-  difficultyText: {
-    fontSize: 11,
-    fontWeight: '600' as const,
-    color: Colors.surface,
-  },
+
   recipeLikeButton: {
     position: 'absolute' as const,
-    top: 10,
-    right: 10,
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: Colors.surface,
+    top: 8,
+    right: 8,
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    backgroundColor: 'rgba(255,255,255,0.95)',
     alignItems: 'center' as const,
     justifyContent: 'center' as const,
     shadowColor: Colors.shadow.color,
@@ -433,43 +531,29 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   recipeContent: {
-    padding: 12,
+    padding: 10,
   },
   recipeTitle: {
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: '700' as const,
     color: Colors.text.primary,
-    marginBottom: 8,
-    lineHeight: 20,
+    lineHeight: 19,
+    minHeight: 38,
   },
   recipeFooter: {
     flexDirection: 'row' as const,
-    gap: 12,
-    marginBottom: 8,
+    gap: 10,
+    marginTop: 8,
   },
   recipeInfo: {
     flexDirection: 'row' as const,
     alignItems: 'center' as const,
-    gap: 4,
+    gap: 3,
   },
   recipeInfoText: {
-    fontSize: 12,
+    fontSize: 11,
     color: Colors.text.tertiary,
     fontWeight: '500' as const,
-  },
-  recipeTags: {
-    flexDirection: 'row' as const,
-    gap: 6,
-  },
-  recipeTag: {
-    flexDirection: 'row' as const,
-    alignItems: 'center' as const,
-    gap: 4,
-  },
-  recipeTagText: {
-    fontSize: 11,
-    fontWeight: '600' as const,
-    color: Colors.text.tertiary,
   },
 
 });

@@ -15,11 +15,15 @@ import {
   ChevronRight,
   Star,
   Award,
+  LogOut,
 } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Colors from '@/constants/colors';
+import { useOnboarding } from '@/contexts/OnboardingContext';
 
 export default function ProfileScreen() {
+  const { getUserName, resetOnboarding } = useOnboarding();
+  
   const menuItems = [
     {
       icon: Heart,
@@ -64,8 +68,8 @@ export default function ProfileScreen() {
             <User size={48} color={Colors.surface} strokeWidth={2} />
           </LinearGradient>
 
-          <Text style={styles.userName}>Usuário</Text>
-          <Text style={styles.userEmail}>usuario@exemplo.com</Text>
+          <Text style={styles.userName}>{getUserName()}</Text>
+          <Text style={styles.userEmail}>Membro desde 2025</Text>
 
           <TouchableOpacity style={styles.editButton} activeOpacity={0.7}>
             <Text style={styles.editButtonText}>Editar Perfil</Text>
@@ -150,8 +154,13 @@ export default function ProfileScreen() {
           </LinearGradient>
         </View>
 
-        <TouchableOpacity style={styles.logoutButton} activeOpacity={0.7}>
-          <Text style={styles.logoutText}>Sair da Conta</Text>
+        <TouchableOpacity 
+          style={styles.logoutButton} 
+          activeOpacity={0.7}
+          onPress={resetOnboarding}
+        >
+          <LogOut size={18} color={Colors.error} strokeWidth={2} />
+          <Text style={styles.logoutText}>Refazer Quiz</Text>
         </TouchableOpacity>
 
         <Text style={styles.version}>Versão 1.0.0</Text>
@@ -173,7 +182,7 @@ const styles = StyleSheet.create({
   },
   header: {
     alignItems: 'center' as const,
-    paddingTop: 32,
+    paddingTop: 60,
     paddingBottom: 24,
     paddingHorizontal: 24,
   },
@@ -344,16 +353,19 @@ const styles = StyleSheet.create({
   },
   logoutButton: {
     marginHorizontal: 20,
-    paddingVertical: 16,
+    paddingVertical: 14,
+    flexDirection: 'row' as const,
     alignItems: 'center' as const,
+    justifyContent: 'center' as const,
+    gap: 8,
     borderRadius: 12,
     backgroundColor: Colors.surface,
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: Colors.error,
     marginBottom: 16,
   },
   logoutText: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '600' as const,
     color: Colors.error,
   },
