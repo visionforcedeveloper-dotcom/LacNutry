@@ -3,7 +3,7 @@ import createContextHook from '@nkzw/create-context-hook';
 import { trpc } from '@/lib/trpc';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export const [RecipeContext, useRecipes] = createContextHook(() => {
+export const [RecipeProvider, useRecipes] = createContextHook(() => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | undefined>(undefined);
   const [favorites, setFavorites] = useState<string[]>([]);
