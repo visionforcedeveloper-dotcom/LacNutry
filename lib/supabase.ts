@@ -1,9 +1,10 @@
 import { createClient } from '@supabase/supabase-js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
+import Constants from 'expo-constants';
 
-const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL || '';
-const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_KEY || '';
+const supabaseUrl = Constants.expoConfig?.extra?.supabaseUrl || 'https://ggkjubgpftgaxlxivqgh.supabase.co';
+const supabaseAnonKey = Constants.expoConfig?.extra?.supabaseKey || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdna2p1YmdwZnRnYXhseGl2cWdoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgxMDg1ODksImV4cCI6MjA3MzY4NDU4OX0.jsHsjybJ4qshC0ajkCIlNoO3eIgMprCk81oLxmDOuwg';
 
 if (!supabaseUrl || !supabaseAnonKey) {
   console.error('Missing Supabase environment variables');
@@ -43,11 +44,11 @@ const supabaseStorage = {
   },
 };
 
-export const supabase = supabaseUrl && supabaseAnonKey ? createClient(supabaseUrl, supabaseAnonKey, {
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     storage: supabaseStorage,
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: false,
   },
-}) : null as any;
+});

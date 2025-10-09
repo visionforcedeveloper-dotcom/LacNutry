@@ -9,20 +9,20 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!supabase) {
-      console.error('Supabase client not initialized');
-      setLoading(false);
-      return;
-    }
 
-    supabase.auth.getSession().then(({ data: { session } }: { data: { session: Session | null } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-    }).catch((error: unknown) => {
-      console.error('Error getting session:', error);
-      setLoading(false);
-    });
+    const initAuth = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        setSession(session);
+        setUser(session?.user ?? null);
+      } catch (error) {
+        console.error('Error getting session:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    initAuth();
 
     const {
       data: { subscription },
@@ -35,9 +35,6 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
   }, []);
 
   const signUp = useCallback(async (email: string, password: string) => {
-    if (!supabase) {
-      return { data: null, error: new Error('Supabase not initialized') };
-    }
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -46,9 +43,6 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
   }, []);
 
   const signIn = useCallback(async (email: string, password: string) => {
-    if (!supabase) {
-      return { data: null, error: new Error('Supabase not initialized') };
-    }
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -57,9 +51,6 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
   }, []);
 
   const signOut = useCallback(async () => {
-    if (!supabase) {
-      return { error: new Error('Supabase not initialized') };
-    }
     const { error } = await supabase.auth.signOut();
     return { error };
   }, []);
