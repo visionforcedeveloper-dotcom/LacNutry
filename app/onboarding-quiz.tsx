@@ -59,7 +59,7 @@ export default function OnboardingQuiz() {
     await completeOnboarding(finalAnswers);
     
     setTimeout(() => {
-      router.replace('/auth');
+      router.replace('/quiz-loading');
     }, 100);
   };
 

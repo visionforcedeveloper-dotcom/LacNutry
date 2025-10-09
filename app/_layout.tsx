@@ -39,6 +39,8 @@ function RootLayoutNav() {
     <Stack screenOptions={{ headerBackTitle: 'Voltar' }}>
       <Stack.Screen name="onboarding-welcome" options={{ headerShown: false }} />
       <Stack.Screen name="onboarding-quiz" options={{ headerShown: false }} />
+      <Stack.Screen name="quiz-loading" options={{ headerShown: false }} />
+      <Stack.Screen name="paywall" options={{ headerShown: false }} />
       <Stack.Screen name="auth" options={{ headerShown: false }} />
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
     </Stack>

@@ -57,6 +57,11 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
     return { error };
   }, []);
 
+  const completeSubscription = useCallback(async () => {
+    console.log('Subscription completed');
+    setIsAuthenticated(true);
+  }, []);
+
   return useMemo(
     () => ({
       session,
@@ -66,7 +71,8 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
       signUp,
       signIn,
       signOut,
+      completeSubscription,
     }),
-    [session, user, loading, isAuthenticated, signUp, signIn, signOut]
+    [session, user, loading, isAuthenticated, signUp, signIn, signOut, completeSubscription]
   );
 });
