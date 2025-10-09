@@ -132,28 +132,6 @@ export default function ProfileScreen() {
           </View>
         </View>
 
-        <View style={styles.premiumCard}>
-          <LinearGradient
-            colors={Colors.gradient.purple}
-            style={styles.premiumGradient}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-          >
-            <View style={styles.premiumContent}>
-              <View style={styles.premiumIconContainer}>
-                <Star size={32} color={Colors.surface} strokeWidth={2} fill={Colors.surface} />
-              </View>
-              <Text style={styles.premiumTitle}>Upgrade para Premium</Text>
-              <Text style={styles.premiumDescription}>
-                Acesse receitas exclusivas, planos personalizados e muito mais
-              </Text>
-              <TouchableOpacity style={styles.premiumButton} activeOpacity={0.8}>
-                <Text style={styles.premiumButtonText}>Assinar Agora</Text>
-              </TouchableOpacity>
-            </View>
-          </LinearGradient>
-        </View>
-
         <TouchableOpacity 
           style={styles.logoutButton} 
           activeOpacity={0.7}
@@ -305,51 +283,6 @@ const styles = StyleSheet.create({
   menuSubtitle: {
     fontSize: 14,
     color: Colors.text.tertiary,
-  },
-  premiumCard: {
-    marginHorizontal: 20,
-    borderRadius: 20,
-    overflow: 'hidden' as const,
-    marginBottom: 24,
-    shadowColor: '#9F7AEA',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.3,
-    shadowRadius: 16,
-    elevation: 8,
-  },
-  premiumGradient: {
-    padding: 24,
-  },
-  premiumContent: {
-    alignItems: 'center' as const,
-  },
-  premiumIconContainer: {
-    marginBottom: 16,
-  },
-  premiumTitle: {
-    fontSize: 22,
-    fontWeight: '700' as const,
-    color: Colors.surface,
-    marginBottom: 8,
-  },
-  premiumDescription: {
-    fontSize: 15,
-    color: Colors.surface,
-    textAlign: 'center' as const,
-    opacity: 0.9,
-    marginBottom: 20,
-    lineHeight: 22,
-  },
-  premiumButton: {
-    backgroundColor: Colors.surface,
-    paddingHorizontal: 32,
-    paddingVertical: 14,
-    borderRadius: 25,
-  },
-  premiumButtonText: {
-    fontSize: 16,
-    fontWeight: '700' as const,
-    color: '#9F7AEA',
   },
   logoutButton: {
     marginHorizontal: 20,
