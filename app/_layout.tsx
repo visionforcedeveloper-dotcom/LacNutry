@@ -7,6 +7,7 @@ import { StatusBar } from 'expo-status-bar';
 import { trpc, trpcClient } from '@/lib/trpc';
 import { RecipeProvider } from '@/contexts/RecipeContext';
 import { OnboardingProvider, useOnboarding } from '@/contexts/OnboardingContext';
+import { AuthProvider } from '@/contexts/AuthContext';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -46,14 +47,16 @@ export default function RootLayout() {
   return (
     <trpc.Provider client={trpcClient} queryClient={queryClient}>
       <QueryClientProvider client={queryClient}>
-        <OnboardingProvider>
-          <RecipeProvider>
-            <GestureHandlerRootView style={{ flex: 1 }}>
-              <StatusBar style="light" />
-              <RootLayoutNav />
-            </GestureHandlerRootView>
-          </RecipeProvider>
-        </OnboardingProvider>
+        <AuthProvider>
+          <OnboardingProvider>
+            <RecipeProvider>
+              <GestureHandlerRootView style={{ flex: 1 }}>
+                <StatusBar style="light" />
+                <RootLayoutNav />
+              </GestureHandlerRootView>
+            </RecipeProvider>
+          </OnboardingProvider>
+        </AuthProvider>
       </QueryClientProvider>
     </trpc.Provider>
   );
