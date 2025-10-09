@@ -31,6 +31,7 @@ export default function HomeScreen() {
     setSearchQuery,
     selectedCategory,
     setSelectedCategory,
+    isLoading,
   } = useRecipes();
   const [searchFocused, setSearchFocused] = useState(false);
 
@@ -155,7 +156,11 @@ export default function HomeScreen() {
           </ScrollView>
         </View>
 
-        {recipes.length === 0 ? (
+        {isLoading ? (
+          <View style={styles.loadingContainer}>
+            <Text style={styles.loadingText}>Carregando receitas...</Text>
+          </View>
+        ) : recipes.length === 0 ? (
           <View style={styles.emptyContainer}>
             <Text style={styles.emptyText}>Nenhuma receita encontrada</Text>
             <Text style={styles.emptySubtext}>Tente ajustar os filtros de busca</Text>

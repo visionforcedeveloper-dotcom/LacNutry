@@ -25,8 +25,17 @@ export default function RecipeDetailScreen() {
 
   const { data: recipe, isLoading, error } = trpc.recipes.detail.useQuery(
     { id: id || '' },
-    { enabled: !!id }
+    { 
+      enabled: !!id,
+      retry: 1,
+      staleTime: 1000 * 60 * 5,
+    }
   );
+
+  console.log('Recipe Detail - ID:', id);
+  console.log('Recipe Detail - Loading:', isLoading);
+  console.log('Recipe Detail - Error:', error);
+  console.log('Recipe Detail - Recipe:', recipe);
 
   if (isLoading) {
     return (
