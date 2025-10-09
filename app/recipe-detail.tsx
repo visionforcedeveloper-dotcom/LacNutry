@@ -7,21 +7,23 @@ import {
   Image,
   TouchableOpacity,
   ActivityIndicator,
+  Dimensions,
 } from 'react-native';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
-import { ArrowLeft, Clock, Flame, Heart, Users, Leaf } from 'lucide-react-native';
+import { ArrowLeft, Clock, Flame, Heart, Users, ChefHat } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Colors from '@/constants/colors';
 import { trpc } from '@/lib/trpc';
 import { useRecipes } from '@/contexts/RecipeContext';
 
+const { width } = Dimensions.get('window');
+
 export default function RecipeDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { toggleFavorite, isFavorite } = useRecipes();
-  const [imageLoaded, setImageLoaded] = useState(false);
   const [activeTab, setActiveTab] = useState<'ingredients' | 'instructions'>('ingredients');
   const [checkedIngredients, setCheckedIngredients] = useState<Set<number>>(new Set());
 
@@ -30,18 +32,8 @@ export default function RecipeDetailScreen() {
     { 
       enabled: !!id,
       retry: 1,
-      staleTime: 1000 * 60 * 5,
-      refetchOnMount: true,
-      refetchOnWindowFocus: false,
     }
   );
-
-  console.log('Recipe Detail - ID:', id);
-  console.log('Recipe Detail - ID Type:', typeof id);
-  console.log('Recipe Detail - Loading:', isLoading);
-  console.log('Recipe Detail - Error:', error);
-  console.log('Recipe Detail - Recipe:', recipe ? recipe.title : 'NO RECIPE');
-  console.log('Recipe Detail - Full Recipe Object:', JSON.stringify(recipe, null, 2));
 
   const toggleIngredient = (index: number) => {
     const newChecked = new Set(checkedIngredients);
@@ -57,8 +49,12 @@ export default function RecipeDetailScreen() {
     return (
       <View style={styles.loadingContainer}>
         <Stack.Screen options={{ headerShown: false }} />
-        <ActivityIndicator size="large" color={Colors.primary} />
-        <Text style={styles.loadingText}>Carregando receita...</Text>
+        <View style={styles.loadingContent}>
+          <View style={styles.spinnerContainer}>
+            <ActivityIndicator size="large" color={Colors.primary} />
+          </View>
+          <Text style={styles.loadingText}>Carregando receita...</Text>
+        </View>
       </View>
     );
   }
@@ -67,7 +63,9 @@ export default function RecipeDetailScreen() {
     return (
       <View style={styles.errorContainer}>
         <Stack.Screen options={{ headerShown: false }} />
-        <Text style={styles.errorText}>Receita não encontrada</Text>
+        <ChefHat size={64} color={Colors.text.tertiary} strokeWidth={1.5} />
+        <Text style={styles.errorTitle}>Receita não encontrada</Text>
+        <Text style={styles.errorSubtext}>A receita que você procura não existe ou foi removida</Text>
         <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
           <Text style={styles.backButtonText}>Voltar</Text>
         </TouchableOpacity>
@@ -78,81 +76,73 @@ export default function RecipeDetailScreen() {
   return (
     <View style={styles.container}>
       <Stack.Screen options={{ headerShown: false }} />
+      
+      <View style={[styles.header, { paddingTop: insets.top }]}>
+        <LinearGradient
+          colors={['rgba(255,255,255,1)', 'rgba(255,255,255,0.95)']}
+          style={styles.headerGradient}
+        >
+          <View style={styles.headerContent}>
+            <TouchableOpacity
+              style={styles.headerButton}
+              onPress={() => router.back()}
+              activeOpacity={0.7}
+            >
+              <ArrowLeft size={24} color={Colors.text.primary} strokeWidth={2.5} />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.headerButton}
+              onPress={() => toggleFavorite(recipe.id)}
+              activeOpacity={0.7}
+            >
+              <Heart
+                size={24}
+                color={isFavorite(recipe.id) ? '#FF6B6B' : Colors.text.primary}
+                strokeWidth={2.5}
+                fill={isFavorite(recipe.id) ? '#FF6B6B' : 'transparent'}
+              />
+            </TouchableOpacity>
+          </View>
+        </LinearGradient>
+      </View>
+
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         <View style={styles.imageContainer}>
           <Image
             source={{ uri: recipe.image }}
             style={styles.image}
             resizeMode="cover"
-            onLoad={() => setImageLoaded(true)}
           />
-          {!imageLoaded && (
-            <View style={styles.imagePlaceholder}>
-              <ActivityIndicator size="large" color={Colors.surface} />
-            </View>
-          )}
-          <LinearGradient
-            colors={['rgba(0,0,0,0.4)', 'transparent', 'transparent', 'rgba(0,0,0,0.7)']}
-            style={styles.imageGradient}
-          />
-          <View style={styles.headerOverlay}>
-            <Text style={styles.overlayTitle}>{recipe.title}</Text>
-            {recipe.tags && recipe.tags.length > 0 && (
-              <View style={styles.overlayTagContainer}>
-                <View style={styles.overlayTag}>
-                  <Leaf size={14} color={Colors.surface} strokeWidth={2.5} />
-                  <Text style={styles.overlayTagText}>{recipe.tags[0]}</Text>
-                </View>
-              </View>
-            )}
-          </View>
-          <TouchableOpacity
-            style={[styles.backIconButton, { top: insets.top + 10 }]}
-            onPress={() => router.back()}
-            activeOpacity={0.8}
-          >
-            <ArrowLeft size={24} color={Colors.surface} strokeWidth={2.5} />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.favoriteButton, { top: insets.top + 10 }]}
-            onPress={() => toggleFavorite(recipe.id)}
-            activeOpacity={0.8}
-          >
-            <Heart
-              size={26} 
-              color={Colors.surface}
-              strokeWidth={2.5}
-              fill={isFavorite(recipe.id) ? Colors.surface : 'transparent'}
-            />
-          </TouchableOpacity>
         </View>
 
         <View style={styles.content}>
-          <View style={styles.statsContainer}>
-            <View style={styles.statCard}>
-              <Clock size={24} color={Colors.text.secondary} strokeWidth={2} />
-              <Text style={styles.statValue}>{recipe.prepTime} min</Text>
-              <Text style={styles.statLabel}>Tempo</Text>
-            </View>
-            <View style={styles.statCard}>
-              <Flame size={24} color={Colors.text.secondary} strokeWidth={2} />
-              <Text style={styles.statValue}>{recipe.nutritionInfo?.calories}</Text>
-              <Text style={styles.statLabel}>Calorias</Text>
-            </View>
-            <View style={styles.statCard}>
-              <Users size={24} color={Colors.text.secondary} strokeWidth={2} />
-              <Text style={styles.statValue}>{recipe.servings}</Text>
-              <Text style={styles.statLabel}>Porções</Text>
-            </View>
-            <View style={styles.statCard}>
-              <Leaf size={24} color={Colors.text.secondary} strokeWidth={2} />
-              <Text style={styles.statValue}>{recipe.difficulty}</Text>
-              <Text style={styles.statLabel}>Nível</Text>
-            </View>
+          <View style={styles.titleSection}>
+            <Text style={styles.title}>{recipe.title}</Text>
+            <Text style={styles.description}>{recipe.description}</Text>
           </View>
 
-          <View style={styles.descriptionContainer}>
-            <Text style={styles.description}>{recipe.description}</Text>
+          <View style={styles.statsContainer}>
+            <View style={styles.statCard}>
+              <View style={styles.statIconContainer}>
+                <Clock size={20} color={Colors.primary} strokeWidth={2.5} />
+              </View>
+              <Text style={styles.statValue}>{recipe.prepTime}</Text>
+              <Text style={styles.statLabel}>minutos</Text>
+            </View>
+            <View style={styles.statCard}>
+              <View style={styles.statIconContainer}>
+                <Flame size={20} color={Colors.primary} strokeWidth={2.5} />
+              </View>
+              <Text style={styles.statValue}>{recipe.nutritionInfo?.calories}</Text>
+              <Text style={styles.statLabel}>calorias</Text>
+            </View>
+            <View style={styles.statCard}>
+              <View style={styles.statIconContainer}>
+                <Users size={20} color={Colors.primary} strokeWidth={2.5} />
+              </View>
+              <Text style={styles.statValue}>{recipe.servings}</Text>
+              <Text style={styles.statLabel}>porções</Text>
+            </View>
           </View>
 
           <View style={styles.tabContainer}>
@@ -194,48 +184,44 @@ export default function RecipeDetailScreen() {
 
           {activeTab === 'ingredients' ? (
             <View style={styles.section}>
-              <View style={styles.ingredientsList}>
-                {recipe.ingredients.map((ingredient, index) => (
-                  <TouchableOpacity
-                    key={index}
-                    style={styles.ingredientItem}
-                    onPress={() => toggleIngredient(index)}
-                    activeOpacity={0.7}
+              {recipe.ingredients.map((ingredient, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={styles.ingredientItem}
+                  onPress={() => toggleIngredient(index)}
+                  activeOpacity={0.7}
+                >
+                  <View
+                    style={[
+                      styles.checkbox,
+                      checkedIngredients.has(index) && styles.checkboxChecked,
+                    ]}
                   >
-                    <View
-                      style={[
-                        styles.checkbox,
-                        checkedIngredients.has(index) && styles.checkboxChecked,
-                      ]}
-                    >
-                      {checkedIngredients.has(index) && (
-                        <View style={styles.checkboxInner} />
-                      )}
-                    </View>
-                    <Text
-                      style={[
-                        styles.ingredientText,
-                        checkedIngredients.has(index) && styles.ingredientTextChecked,
-                      ]}
-                    >
-                      {ingredient}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
+                    {checkedIngredients.has(index) && (
+                      <View style={styles.checkboxInner} />
+                    )}
+                  </View>
+                  <Text
+                    style={[
+                      styles.ingredientText,
+                      checkedIngredients.has(index) && styles.ingredientTextChecked,
+                    ]}
+                  >
+                    {ingredient}
+                  </Text>
+                </TouchableOpacity>
+              ))}
             </View>
           ) : (
             <View style={styles.section}>
-              <View style={styles.instructionsList}>
-                {recipe.instructions.map((instruction, index) => (
-                  <View key={index} style={styles.instructionItem}>
-                    <View style={styles.instructionNumber}>
-                      <Text style={styles.instructionNumberText}>{index + 1}</Text>
-                    </View>
-                    <Text style={styles.instructionText}>{instruction}</Text>
+              {recipe.instructions.map((instruction, index) => (
+                <View key={index} style={styles.instructionItem}>
+                  <View style={styles.instructionNumber}>
+                    <Text style={styles.instructionNumberText}>{index + 1}</Text>
                   </View>
-                ))}
-              </View>
+                  <Text style={styles.instructionText}>{instruction}</Text>
+                </View>
+              ))}
             </View>
           )}
 
@@ -255,14 +241,6 @@ export default function RecipeDetailScreen() {
                   <Text style={styles.nutritionValue}>{recipe.nutritionInfo.fat}g</Text>
                   <Text style={styles.nutritionLabel}>Gordura</Text>
                 </View>
-                <View style={styles.nutritionItem}>
-                  <Text style={styles.nutritionValue}>
-                    {recipe.nutritionInfo.carbs > 0
-                      ? Math.round((recipe.nutritionInfo.carbs * 0.1) * 10) / 10
-                      : 0}g
-                  </Text>
-                  <Text style={styles.nutritionLabel}>Fibra</Text>
-                </View>
               </View>
             </View>
           )}
@@ -280,16 +258,62 @@ const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
   },
+  header: {
+    position: 'absolute' as const,
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 10,
+  },
+  headerGradient: {
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+  },
+  headerContent: {
+    flexDirection: 'row' as const,
+    justifyContent: 'space-between' as const,
+    alignItems: 'center' as const,
+  },
+  headerButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: Colors.surface,
+    justifyContent: 'center' as const,
+    alignItems: 'center' as const,
+    shadowColor: Colors.shadow.color,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
+  },
   loadingContainer: {
+    flex: 1,
+    backgroundColor: Colors.background,
+  },
+  loadingContent: {
     flex: 1,
     justifyContent: 'center' as const,
     alignItems: 'center' as const,
-    backgroundColor: Colors.background,
+    paddingHorizontal: 24,
+  },
+  spinnerContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: Colors.surface,
+    justifyContent: 'center' as const,
+    alignItems: 'center' as const,
+    marginBottom: 24,
+    shadowColor: Colors.shadow.color,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 4,
   },
   loadingText: {
-    marginTop: 16,
-    fontSize: 16,
-    color: Colors.text.secondary,
+    fontSize: 18,
+    color: Colors.text.primary,
     fontWeight: '600' as const,
   },
   errorContainer: {
@@ -297,18 +321,27 @@ const styles = StyleSheet.create({
     justifyContent: 'center' as const,
     alignItems: 'center' as const,
     backgroundColor: Colors.background,
-    paddingHorizontal: 24,
+    paddingHorizontal: 40,
   },
-  errorText: {
-    fontSize: 18,
+  errorTitle: {
+    fontSize: 24,
     fontWeight: '700' as const,
     color: Colors.text.primary,
-    marginBottom: 24,
+    marginTop: 24,
+    marginBottom: 12,
+    textAlign: 'center' as const,
+  },
+  errorSubtext: {
+    fontSize: 15,
+    color: Colors.text.secondary,
+    textAlign: 'center' as const,
+    lineHeight: 22,
+    marginBottom: 32,
   },
   backButton: {
     backgroundColor: Colors.primary,
-    paddingHorizontal: 32,
-    paddingVertical: 14,
+    paddingHorizontal: 40,
+    paddingVertical: 16,
     borderRadius: 12,
   },
   backButtonText: {
@@ -317,90 +350,28 @@ const styles = StyleSheet.create({
     color: Colors.surface,
   },
   imageContainer: {
-    width: '100%',
-    height: 380,
-    position: 'relative' as const,
+    width: width,
+    height: 300,
+    backgroundColor: Colors.surface,
   },
   image: {
     width: '100%',
     height: '100%',
   },
-  imagePlaceholder: {
-    position: 'absolute' as const,
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    justifyContent: 'center' as const,
-    alignItems: 'center' as const,
-    backgroundColor: Colors.background,
-  },
-  imageGradient: {
-    position: 'absolute' as const,
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-  },
-  backIconButton: {
-    position: 'absolute' as const,
-    left: 20,
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: 'rgba(255,255,255,0.25)',
-    justifyContent: 'center' as const,
-    alignItems: 'center' as const,
-  },
-  favoriteButton: {
-    position: 'absolute' as const,
-    right: 20,
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: 'rgba(255,255,255,0.25)',
-    justifyContent: 'center' as const,
-    alignItems: 'center' as const,
-  },
-  headerOverlay: {
-    position: 'absolute' as const,
-    bottom: 24,
-    left: 24,
-    right: 24,
-  },
-  overlayTitle: {
-    fontSize: 32,
-    fontWeight: '800' as const,
-    color: Colors.surface,
-    lineHeight: 40,
-    marginBottom: 12,
-    textShadowColor: 'rgba(0,0,0,0.3)',
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 4,
-  },
-  overlayTagContainer: {
-    flexDirection: 'row' as const,
-  },
-  overlayTag: {
-    flexDirection: 'row' as const,
-    alignItems: 'center' as const,
-    gap: 6,
-    backgroundColor: 'rgba(79,209,197,0.9)',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
-  },
-  overlayTagText: {
-    fontSize: 14,
-    fontWeight: '600' as const,
-    color: Colors.surface,
-  },
   content: {
     paddingBottom: 40,
   },
-  descriptionContainer: {
+  titleSection: {
     paddingHorizontal: 24,
-    marginBottom: 24,
+    paddingTop: 24,
+    paddingBottom: 20,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: '800' as const,
+    color: Colors.text.primary,
+    lineHeight: 36,
+    marginBottom: 12,
   },
   description: {
     fontSize: 15,
@@ -410,26 +381,38 @@ const styles = StyleSheet.create({
   statsContainer: {
     flexDirection: 'row' as const,
     paddingHorizontal: 24,
-    paddingTop: 24,
-    paddingBottom: 20,
-    gap: 8,
-    backgroundColor: Colors.surface,
+    gap: 12,
+    marginBottom: 24,
   },
   statCard: {
     flex: 1,
-    backgroundColor: '#F7F9FC',
-    borderRadius: 12,
-    padding: 12,
+    backgroundColor: Colors.surface,
+    borderRadius: 16,
+    padding: 16,
     alignItems: 'center' as const,
-    gap: 4,
+    shadowColor: Colors.shadow.color,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  statIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: Colors.secondary,
+    justifyContent: 'center' as const,
+    alignItems: 'center' as const,
+    marginBottom: 8,
   },
   statValue: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '700' as const,
     color: Colors.text.primary,
+    marginBottom: 2,
   },
   statLabel: {
-    fontSize: 11,
+    fontSize: 12,
     color: Colors.text.tertiary,
     fontWeight: '500' as const,
   },
@@ -437,7 +420,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row' as const,
     paddingHorizontal: 24,
     gap: 12,
-    marginBottom: 20,
+    marginBottom: 24,
   },
   tab: {
     flex: 1,
@@ -445,9 +428,12 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     backgroundColor: Colors.surface,
     alignItems: 'center' as const,
+    borderWidth: 1.5,
+    borderColor: Colors.border,
   },
   activeTab: {
     backgroundColor: Colors.primary,
+    borderColor: Colors.primary,
   },
   tabText: {
     fontSize: 15,
@@ -456,45 +442,12 @@ const styles = StyleSheet.create({
   },
   activeTabText: {
     color: Colors.surface,
+    fontWeight: '700' as const,
   },
   section: {
     paddingHorizontal: 24,
-    marginBottom: 24,
-  },
-  nutritionSection: {
-    paddingHorizontal: 24,
-    marginTop: 8,
-  },
-  nutritionTitle: {
-    fontSize: 20,
-    fontWeight: '700' as const,
-    color: Colors.text.primary,
-    marginBottom: 16,
-  },
-  nutritionGrid: {
-    flexDirection: 'row' as const,
     gap: 12,
-  },
-  nutritionItem: {
-    flex: 1,
-    backgroundColor: Colors.surface,
-    borderRadius: 12,
-    padding: 16,
-    alignItems: 'center' as const,
-  },
-  nutritionValue: {
-    fontSize: 22,
-    fontWeight: '700' as const,
-    color: Colors.primary,
-    marginBottom: 4,
-  },
-  nutritionLabel: {
-    fontSize: 12,
-    color: Colors.text.secondary,
-    fontWeight: '500' as const,
-  },
-  ingredientsList: {
-    gap: 10,
+    marginBottom: 24,
   },
   ingredientItem: {
     flexDirection: 'row' as const,
@@ -535,9 +488,6 @@ const styles = StyleSheet.create({
     color: Colors.text.tertiary,
     textDecorationLine: 'line-through' as const,
   },
-  instructionsList: {
-    gap: 12,
-  },
   instructionItem: {
     flexDirection: 'row' as const,
     gap: 12,
@@ -563,6 +513,37 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: Colors.text.primary,
     lineHeight: 22,
+    fontWeight: '500' as const,
+  },
+  nutritionSection: {
+    paddingHorizontal: 24,
+  },
+  nutritionTitle: {
+    fontSize: 20,
+    fontWeight: '700' as const,
+    color: Colors.text.primary,
+    marginBottom: 16,
+  },
+  nutritionGrid: {
+    flexDirection: 'row' as const,
+    gap: 12,
+  },
+  nutritionItem: {
+    flex: 1,
+    backgroundColor: Colors.surface,
+    borderRadius: 12,
+    padding: 16,
+    alignItems: 'center' as const,
+  },
+  nutritionValue: {
+    fontSize: 22,
+    fontWeight: '700' as const,
+    color: Colors.primary,
+    marginBottom: 4,
+  },
+  nutritionLabel: {
+    fontSize: 12,
+    color: Colors.text.secondary,
     fontWeight: '500' as const,
   },
 });
