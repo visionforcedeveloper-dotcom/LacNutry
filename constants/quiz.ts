@@ -214,4 +214,57 @@ export const quizQuestions: QuizQuestion[] = [
       'Nunca',
     ],
   },
+  {
+    id: 20,
+    question: 'Qual é a sua idade?',
+    type: 'text',
+    placeholder: '55',
+  },
+  {
+    id: 21,
+    question: 'Qual é o seu gênero?',
+    type: 'single',
+    options: [
+      'Masculino',
+      'Feminino',
+      'Outro',
+      'Prefiro não dizer',
+    ],
+  },
+  {
+    id: 22,
+    question: 'Qual é a sua altura? (em cm)',
+    type: 'text',
+    placeholder: '52',
+  },
+  {
+    id: 23,
+    question: 'Qual é o seu peso? (em kg)',
+    type: 'text',
+    placeholder: '55',
+  },
+  {
+    id: 24,
+    question: 'Qual é o seu nível de atividade física?',
+    type: 'single',
+    options: [
+      'Sedentário - Pouca ou nenhuma atividade',
+      'Leve - Exercício 1-3 dias/semana',
+      'Moderado - Exercício 3-5 dias/semana',
+      'Ativo - Exercício 6-7 dias/semana',
+      'Muito ativo - Exercício intenso diário',
+    ],
+  },
+  {
+    id: 25,
+    question: 'Qual é o seu principal objetivo?',
+    type: 'single',
+    options: [
+      'Manter peso atual',
+      'Perder peso',
+      'Ganhar peso',
+      'Ganhar massa muscular',
+      'Melhorar saúde geral',
+    ],
+  },
 ];
