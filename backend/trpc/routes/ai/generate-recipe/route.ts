@@ -1,0 +1,79 @@
+import { publicProcedure } from "../../../create-context";
+import { z } from "zod";
+import { generateObject } from "@rork/toolkit-sdk";
+
+const recipeSchema = z.object({
+  title: z.string(),
+  description: z.string(),
+  prepTime: z.number(),
+  servings: z.number(),
+  difficulty: z.enum(["Fácil", "Médio", "Difícil"]),
+  category: z.string(),
+  tags: z.array(z.string()),
+  ingredients: z.array(z.string()),
+  instructions: z.array(z.string()),
+  nutritionInfo: z.object({
+    calories: z.number(),
+    protein: z.number(),
+    carbs: z.number(),
+    fat: z.number(),
+  }),
+});
+
+export const generateRecipeProcedure = publicProcedure
+  .input(
+    z.object({
+      prompt: z.string(),
+      preferences: z
+        .object({
+          difficulty: z.enum(["Fácil", "Médio", "Difícil"]).optional(),
+          prepTime: z.number().optional(),
+          servings: z.number().optional(),
+          category: z.string().optional(),
+        })
+        .optional(),
+    })
+  )
+  .mutation(async ({ input }) => {
+    const preferencesText = input.preferences
+      ? `
+Preferências:
+- Dificuldade: ${input.preferences.difficulty || "qualquer"}
+- Tempo de preparo: ${input.preferences.prepTime ? `até ${input.preferences.prepTime} minutos` : "qualquer"}
+- Porções: ${input.preferences.servings || "qualquer quantidade"}
+- Categoria: ${input.preferences.category || "qualquer"}
+`
+      : "";
+
+    const recipe = await generateObject({
+      messages: [
+        {
+          role: "user",
+          content: `Você é um chef especializado em receitas sem lactose. Crie uma receita deliciosa e 100% sem lactose baseada nesta solicitação:
+
+${input.prompt}
+
+${preferencesText}
+
+IMPORTANTE:
+- A receita DEVE ser completamente sem lactose
+- Use alternativas vegetais (leite de amêndoas, coco, aveia, etc.)
+- Seja criativo e detalhado
+- Inclua informações nutricionais aproximadas
+- As instruções devem ser claras e fáceis de seguir
+- Adicione a tag "Sem Lactose" nas tags`,
+        },
+      ],
+      schema: recipeSchema,
+    });
+
+    return {
+      ...recipe,
+      id: `generated-${Date.now()}`,
+      image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80",
+      lactoseFree: true,
+      tags: [...recipe.tags, "Sem Lactose"],
+    };
+  });
+
+export default generateRecipeProcedure;

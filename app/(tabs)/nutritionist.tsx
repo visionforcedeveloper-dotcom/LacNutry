@@ -9,15 +9,10 @@ import {
 import { Brain, Sparkles, BookOpen } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Colors from '@/constants/colors';
-import { Stack } from 'expo-router';
+import { Stack, useRouter } from 'expo-router';
 
 export default function NutritionistScreen() {
-  const suggestions = [
-    'Como substituir leite em receitas?',
-    'Quais alimentos são ricos em cálcio?',
-    'Receita de bolo sem lactose',
-    'Alternativas ao queijo',
-  ];
+  const router = useRouter();
 
   return (
     <View style={styles.container}>
@@ -37,7 +32,7 @@ export default function NutritionistScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>🤖 Assistentes de IA</Text>
           
-          <TouchableOpacity style={styles.aiCard} activeOpacity={0.9}>
+          <TouchableOpacity style={styles.aiCard} activeOpacity={0.9} onPress={() => router.push('/nutritionist-chat' as any)}>
             <View style={styles.aiIconContainer}>
               <View style={[styles.aiIcon, { backgroundColor: '#FFE5E5' }]}>
                 <Brain size={28} color='#FF6B6B' strokeWidth={2} />
@@ -51,7 +46,7 @@ export default function NutritionistScreen() {
             </View>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.aiCard} activeOpacity={0.9}>
+          <TouchableOpacity style={styles.aiCard} activeOpacity={0.9} onPress={() => router.push('/recipe-generator' as any)}>
             <View style={styles.aiIconContainer}>
               <View style={[styles.aiIcon, { backgroundColor: '#E0F2FE' }]}>
                 <BookOpen size={28} color='#0EA5E9' strokeWidth={2} />

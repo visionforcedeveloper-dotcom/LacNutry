@@ -5,6 +5,7 @@ import React, { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { StatusBar } from 'expo-status-bar';
 import { trpc, trpcClient } from '@/lib/trpc';
+import { RecipeProvider } from '@/contexts/RecipeContext';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -26,10 +27,12 @@ export default function RootLayout() {
   return (
     <trpc.Provider client={trpcClient} queryClient={queryClient}>
       <QueryClientProvider client={queryClient}>
-        <GestureHandlerRootView style={{ flex: 1 }}>
-          <StatusBar style="dark" />
-          <RootLayoutNav />
-        </GestureHandlerRootView>
+        <RecipeProvider>
+          <GestureHandlerRootView style={{ flex: 1 }}>
+            <StatusBar style="dark" />
+            <RootLayoutNav />
+          </GestureHandlerRootView>
+        </RecipeProvider>
       </QueryClientProvider>
     </trpc.Provider>
   );
