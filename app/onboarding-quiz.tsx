@@ -73,6 +73,9 @@ export default function OnboardingQuiz() {
   };
 
   const isAnswered = () => {
+    if (question.type === 'info') {
+      return true;
+    }
     if (question.type === 'text') {
       return textInput.trim().length > 0 || !!answers[question.id];
     }
@@ -105,6 +108,10 @@ export default function OnboardingQuiz() {
           showsVerticalScrollIndicator={false}
         >
           <Text style={styles.question}>{question.question}</Text>
+
+          {question.subtitle && (
+            <Text style={styles.subtitle}>{question.subtitle}</Text>
+          )}
 
           {question.type === 'text' && (
             <TextInput
@@ -238,6 +245,14 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     marginBottom: 32,
     lineHeight: 40,
+  },
+  subtitle: {
+    fontSize: 18,
+    fontWeight: '500' as const,
+    color: 'rgba(255, 255, 255, 0.9)',
+    marginTop: -16,
+    marginBottom: 32,
+    lineHeight: 26,
   },
   textInput: {
     backgroundColor: 'rgba(255, 255, 255, 0.15)',
