@@ -37,6 +37,10 @@ export default function HomeScreen() {
   const [searchFocused, setSearchFocused] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
 
+  console.log('HomeScreen - Recipes count:', recipes.length);
+  console.log('HomeScreen - Categories count:', categories.length);
+  console.log('HomeScreen - Is loading:', isLoading);
+
   return (
     <View style={styles.container}>
       <Stack.Screen options={{ headerShown: false }} />
@@ -162,6 +166,12 @@ export default function HomeScreen() {
         {isLoading ? (
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color={Colors.primary} />
+            <Text style={styles.loadingText}>Carregando receitas...</Text>
+          </View>
+        ) : recipes.length === 0 ? (
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyText}>Nenhuma receita encontrada</Text>
+            <Text style={styles.emptySubtext}>Tente ajustar os filtros de busca</Text>
           </View>
         ) : (
           <>
@@ -589,5 +599,27 @@ const styles = StyleSheet.create({
     color: Colors.text.tertiary,
     fontWeight: '500' as const,
   },
-
+  loadingText: {
+    marginTop: 12,
+    fontSize: 14,
+    color: Colors.text.secondary,
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center' as const,
+    alignItems: 'center' as const,
+    paddingVertical: 60,
+    paddingHorizontal: 24,
+  },
+  emptyText: {
+    fontSize: 18,
+    fontWeight: '700' as const,
+    color: Colors.text.primary,
+    marginBottom: 8,
+  },
+  emptySubtext: {
+    fontSize: 14,
+    color: Colors.text.tertiary,
+    textAlign: 'center' as const,
+  },
 });

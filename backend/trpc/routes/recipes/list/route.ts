@@ -11,6 +11,8 @@ export const listRecipesProcedure = publicProcedure
     })
   )
   .query(({ input }) => {
+    console.log('Backend - listRecipesProcedure called with input:', input);
+    console.log('Backend - Total recipes available:', featuredRecipes.length);
     let filtered = [...featuredRecipes];
 
     if (input.search) {
@@ -33,6 +35,8 @@ export const listRecipesProcedure = publicProcedure
       filtered = filtered.slice(0, input.limit);
     }
 
+    console.log('Backend - Returning recipes count:', filtered.length);
+    console.log('Backend - Returning categories count:', categories.length);
     return {
       recipes: filtered,
       categories,

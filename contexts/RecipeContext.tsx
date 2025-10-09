@@ -2,6 +2,7 @@ import createContextHook from '@nkzw/create-context-hook';
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { trpc } from '@/lib/trpc';
+import { featuredRecipes, categories as mockCategories } from '@/mocks/recipes';
 
 const FAVORITES_KEY = '@lactofree_favorites';
 
@@ -14,6 +15,10 @@ export const [RecipeProvider, useRecipes] = createContextHook(() => {
     search: searchQuery,
     category: selectedCategory,
   });
+
+  console.log('RecipeContext - Query data:', recipesQuery.data);
+  console.log('RecipeContext - Query isLoading:', recipesQuery.isLoading);
+  console.log('RecipeContext - Query error:', recipesQuery.error);
 
   useEffect(() => {
     AsyncStorage.getItem(FAVORITES_KEY).then((stored) => {
@@ -38,8 +43,8 @@ export const [RecipeProvider, useRecipes] = createContextHook(() => {
   const isFavorite = useCallback((recipeId: string) => favorites.includes(recipeId), [favorites]);
 
   return useMemo(() => ({
-    recipes: recipesQuery.data?.recipes || [],
-    categories: recipesQuery.data?.categories || [],
+    recipes: recipesQuery.data?.recipes || featuredRecipes,
+    categories: recipesQuery.data?.categories || mockCategories,
     isLoading: recipesQuery.isLoading,
     error: recipesQuery.error,
     refetch: recipesQuery.refetch,
