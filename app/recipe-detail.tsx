@@ -29,13 +29,17 @@ export default function RecipeDetailScreen() {
       enabled: !!id,
       retry: 1,
       staleTime: 1000 * 60 * 5,
+      refetchOnMount: true,
+      refetchOnWindowFocus: false,
     }
   );
 
   console.log('Recipe Detail - ID:', id);
+  console.log('Recipe Detail - ID Type:', typeof id);
   console.log('Recipe Detail - Loading:', isLoading);
   console.log('Recipe Detail - Error:', error);
-  console.log('Recipe Detail - Recipe:', recipe);
+  console.log('Recipe Detail - Recipe:', recipe ? recipe.title : 'NO RECIPE');
+  console.log('Recipe Detail - Full Recipe Object:', JSON.stringify(recipe, null, 2));
 
   if (isLoading) {
     return (
