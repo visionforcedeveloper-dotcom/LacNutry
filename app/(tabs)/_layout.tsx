@@ -1,6 +1,5 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
-import { StyleSheet } from 'react-native';
 import { Home, ScanLine, Heart, Brain, User } from 'lucide-react-native';
 import Colors from '@/constants/colors';
 
@@ -23,10 +22,6 @@ export default function TabLayout() {
         tabBarLabelStyle: {
           fontSize: 11,
           fontWeight: '600' as const,
-          marginTop: 4,
-        },
-        tabBarIconStyle: {
-          marginTop: 4,
         },
       }}
     >
@@ -75,8 +70,18 @@ export default function TabLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="nutritionist-chat"
+        options={{
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name="recipe-generator"
+        options={{
+          href: null,
+        }}
+      />
     </Tabs>
   );
 }
-
-const styles = StyleSheet.create({});
