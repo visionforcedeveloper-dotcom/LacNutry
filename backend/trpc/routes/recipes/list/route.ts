@@ -35,11 +35,18 @@ export const listRecipesProcedure = publicProcedure
       filtered = filtered.slice(0, input.limit);
     }
 
+    const categoriesWithCount = categories.map((category) => ({
+      ...category,
+      recipeCount: featuredRecipes.filter(
+        (recipe) => recipe.category === category.name
+      ).length,
+    }));
+
     console.log('Backend - Returning recipes count:', filtered.length);
-    console.log('Backend - Returning categories count:', categories.length);
+    console.log('Backend - Returning categories count:', categoriesWithCount.length);
     return {
       recipes: filtered,
-      categories,
+      categories: categoriesWithCount,
     };
   });
 

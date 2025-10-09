@@ -19,8 +19,12 @@ export const [RecipeProvider, useRecipes] = createContextHook(() => {
     {
       staleTime: 1000 * 60 * 5,
       refetchOnWindowFocus: false,
-      refetchOnMount: true,
+      refetchOnMount: false,
       enabled: true,
+      initialData: {
+        recipes: featuredRecipes,
+        categories: mockCategories,
+      },
     }
   );
 
@@ -46,25 +50,26 @@ export const [RecipeProvider, useRecipes] = createContextHook(() => {
 
   const isFavorite = useCallback((recipeId: string) => favorites.includes(recipeId), [favorites]);
 
-  const recipes = recipesQuery.data?.recipes || [];
-  const categories = recipesQuery.data?.categories || [];
+  return useMemo(() => {
+    const recipes = recipesQuery.data?.recipes || [];
+    const categories = recipesQuery.data?.categories || [];
 
-  return useMemo(() => ({
-    recipes,
-    categories,
-    isLoading: recipesQuery.isLoading,
-    error: recipesQuery.error,
-    refetch: recipesQuery.refetch,
-    favorites,
-    toggleFavorite,
-    isFavorite,
-    searchQuery,
-    setSearchQuery,
-    selectedCategory,
-    setSelectedCategory,
-  }), [
-    recipes,
-    categories,
+    return {
+      recipes,
+      categories,
+      isLoading: recipesQuery.isLoading,
+      error: recipesQuery.error,
+      refetch: recipesQuery.refetch,
+      favorites,
+      toggleFavorite,
+      isFavorite,
+      searchQuery,
+      setSearchQuery,
+      selectedCategory,
+      setSelectedCategory,
+    };
+  }, [
+    recipesQuery.data,
     recipesQuery.isLoading,
     recipesQuery.error,
     recipesQuery.refetch,
