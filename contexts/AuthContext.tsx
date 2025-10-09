@@ -7,14 +7,15 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-
     const initAuth = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         setSession(session);
         setUser(session?.user ?? null);
+        setIsAuthenticated(!!session);
       } catch (error) {
         console.error('Error getting session:', error);
       } finally {
@@ -29,6 +30,7 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
     } = supabase.auth.onAuthStateChange((_event: unknown, session: Session | null) => {
       setSession(session);
       setUser(session?.user ?? null);
+      setIsAuthenticated(!!session);
     });
 
     return () => subscription.unsubscribe();
@@ -60,10 +62,11 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
       session,
       user,
       loading,
+      isAuthenticated,
       signUp,
       signIn,
       signOut,
     }),
-    [session, user, loading, signUp, signIn, signOut]
+    [session, user, loading, isAuthenticated, signUp, signIn, signOut]
   );
 });

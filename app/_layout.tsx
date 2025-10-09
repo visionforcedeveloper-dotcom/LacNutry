@@ -7,33 +7,41 @@ import { StatusBar } from 'expo-status-bar';
 import { trpc, trpcClient } from '@/lib/trpc';
 import { RecipeProvider } from '@/contexts/RecipeContext';
 import { OnboardingProvider, useOnboarding } from '@/contexts/OnboardingContext';
-import { AuthProvider } from '@/contexts/AuthContext';
+import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 
 SplashScreen.preventAutoHideAsync();
 
 const queryClient = new QueryClient();
 
 function RootLayoutNav() {
-  const { isOnboardingCompleted, isLoading } = useOnboarding();
+  const { isOnboardingCompleted, isLoading: onboardingLoading } = useOnboarding();
+  const { isAuthenticated, loading: authLoading } = useAuth();
   const segments = useSegments();
   const router = useRouter();
 
   useEffect(() => {
-    if (isLoading) return;
+    if (onboardingLoading || authLoading) return;
 
     const inOnboarding = segments[0] === 'onboarding-welcome' || segments[0] === 'onboarding-quiz';
+    const inAuth = segments[0] === 'auth';
+    const inTabs = segments[0] === '(tabs)';
 
     if (!isOnboardingCompleted && !inOnboarding) {
       router.replace('/onboarding-welcome');
+    } else if (isOnboardingCompleted && !isAuthenticated && !inAuth && !inOnboarding) {
+      router.replace('/auth');
     } else if (isOnboardingCompleted && inOnboarding) {
+      router.replace('/auth');
+    } else if (isAuthenticated && !inTabs) {
       router.replace('/(tabs)');
     }
-  }, [isOnboardingCompleted, isLoading, segments, router]);
+  }, [isOnboardingCompleted, isAuthenticated, onboardingLoading, authLoading, segments, router]);
 
   return (
     <Stack screenOptions={{ headerBackTitle: 'Voltar' }}>
       <Stack.Screen name="onboarding-welcome" options={{ headerShown: false }} />
       <Stack.Screen name="onboarding-quiz" options={{ headerShown: false }} />
+      <Stack.Screen name="auth" options={{ headerShown: false }} />
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
     </Stack>
   );
