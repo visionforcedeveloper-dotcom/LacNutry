@@ -12,7 +12,7 @@ import {
 import { Search, Clock, Flame, Heart, ChefHat, Sparkles, Coffee, Utensils, Moon, Cake, Sandwich, GlassWater } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Colors from '@/constants/colors';
-import { Stack, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { useRecipes } from '@/contexts/RecipeContext';
 import { useOnboarding } from '@/contexts/OnboardingContext';
 
@@ -37,7 +37,6 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
-      <Stack.Screen options={{ headerShown: false }} />
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
