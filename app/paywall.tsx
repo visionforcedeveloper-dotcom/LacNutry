@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert, Linking } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Check, X, Sparkles, ChefHat, Camera, MessageCircle } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -18,12 +18,14 @@ export default function Paywall() {
       period: 'mês',
       savings: null,
       pricePerMonth: 27,
+      stripeUrl: 'https://buy.stripe.com/dRm14p1v85Vu6wQ2Iw97G0a',
     },
     annual: {
       price: 97,
       period: 'ano',
       savings: 'Economize R$ 227',
       pricePerMonth: 8.08,
+      stripeUrl: 'https://buy.stripe.com/cNi4gBa1Ees07AUfvi97G0b',
     },
   };
 
@@ -52,7 +54,14 @@ export default function Paywall() {
 
   const handleSubscribe = async () => {
     try {
-      router.replace('/auth');
+      const url = plans[selectedPlan].stripeUrl;
+      const supported = await Linking.canOpenURL(url);
+      
+      if (supported) {
+        await Linking.openURL(url);
+      } else {
+        Alert.alert('Erro', 'Não foi possível abrir o link de pagamento.');
+      }
     } catch {
       Alert.alert('Erro', 'Não foi possível processar a assinatura. Tente novamente.');
     }

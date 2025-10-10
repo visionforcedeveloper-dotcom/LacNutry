@@ -142,18 +142,18 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   progressText: {
-    fontSize: 48,
+    fontSize: 32,
     fontWeight: '800' as const,
     color: '#FFFFFF',
     textAlign: 'center',
   },
   title: {
-    fontSize: 36,
+    fontSize: 28,
     fontWeight: '800' as const,
     color: '#FFFFFF',
     textAlign: 'center',
     marginBottom: 64,
-    lineHeight: 44,
+    lineHeight: 36,
   },
   stepsContainer: {
     gap: 24,
@@ -182,7 +182,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
   },
   stepText: {
-    fontSize: 20,
+    fontSize: 16,
     fontWeight: '700' as const,
     flex: 1,
   },
