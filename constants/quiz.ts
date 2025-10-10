@@ -23,29 +23,6 @@ export const quizQuestions: QuizQuestion[] = [
     placeholder: 'Digite seu nome',
   },
   {
-    id: 3,
-    question: 'Qual é a sua idade?',
-    type: 'single',
-    options: [
-      'Menos de 18 anos',
-      '18-25 anos',
-      '26-35 anos',
-      '36-45 anos',
-      '46-60 anos',
-      'Mais de 60 anos',
-    ],
-  },
-  {
-    id: 4,
-    question: 'Qual é o seu sexo?',
-    type: 'single',
-    options: [
-      'Masculino',
-      'Feminino',
-      'Prefiro não informar',
-    ],
-  },
-  {
     id: 5,
     question: 'Você tem intolerância à lactose?',
     type: 'single',
@@ -190,31 +167,6 @@ export const quizQuestions: QuizQuestion[] = [
     ],
   },
   {
-    id: 18,
-    question: 'Quais tipos de receitas você mais gosta?',
-    type: 'multiple',
-    options: [
-      'Café da manhã',
-      'Almoço/Jantar',
-      'Lanches',
-      'Sobremesas',
-      'Bebidas',
-      'Saladas',
-    ],
-  },
-  {
-    id: 19,
-    question: 'Você costuma ler rótulos de produtos?',
-    type: 'single',
-    options: [
-      'Sempre',
-      'Frequentemente',
-      'Às vezes',
-      'Raramente',
-      'Nunca',
-    ],
-  },
-  {
     id: 20,
     question: 'Qual é a sua idade?',
     type: 'text',
@@ -242,18 +194,6 @@ export const quizQuestions: QuizQuestion[] = [
     question: 'Qual é o seu peso? (em kg)',
     type: 'text',
     placeholder: '55',
-  },
-  {
-    id: 24,
-    question: 'Qual é o seu nível de atividade física?',
-    type: 'single',
-    options: [
-      'Sedentário - Pouca ou nenhuma atividade',
-      'Leve - Exercício 1-3 dias/semana',
-      'Moderado - Exercício 3-5 dias/semana',
-      'Ativo - Exercício 6-7 dias/semana',
-      'Muito ativo - Exercício intenso diário',
-    ],
   },
   {
     id: 25,
