@@ -45,8 +45,15 @@ export default function ProfileScreen() {
           text: 'Sair',
           style: 'destructive',
           onPress: async () => {
-            await signOut();
-            router.replace('/auth');
+            try {
+              console.log('Iniciando logout...');
+              await signOut();
+              console.log('Logout realizado com sucesso');
+              router.replace('/auth');
+            } catch (error) {
+              console.error('Erro ao fazer logout:', error);
+              Alert.alert('Erro', 'Não foi possível sair da conta. Tente novamente.');
+            }
           },
         },
       ]
@@ -61,9 +68,16 @@ export default function ProfileScreen() {
         { text: 'Cancelar', style: 'cancel' },
         {
           text: 'Continuar',
-          onPress: () => {
-            resetOnboarding();
-            router.replace('/onboarding-welcome');
+          onPress: async () => {
+            try {
+              console.log('Resetando quiz...');
+              await resetOnboarding();
+              console.log('Quiz resetado com sucesso');
+              router.replace('/onboarding-welcome');
+            } catch (error) {
+              console.error('Erro ao resetar quiz:', error);
+              Alert.alert('Erro', 'Não foi possível resetar o quiz. Tente novamente.');
+            }
           },
         },
       ]
