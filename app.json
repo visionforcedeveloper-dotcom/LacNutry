@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Lactose-Free Chef",
-    "slug": "lactose-free-chef",
+    "name": "LacNutry",
+    "slug": "lac-nutry",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
