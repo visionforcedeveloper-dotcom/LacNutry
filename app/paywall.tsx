@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert, Modal, ActivityIndicator } from 'react-native';
+import { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert, Modal, ActivityIndicator, Linking } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Check, X, Sparkles, ChefHat, Camera, MessageCircle, ArrowLeft } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -14,6 +14,46 @@ export default function Paywall() {
   const [selectedPlan, setSelectedPlan] = useState<PlanType>('annual');
   const [showPayment, setShowPayment] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const handleDeepLink = (event: { url: string }) => {
+      const url = event.url;
+      console.log('Deep link recebido:', url);
+
+      if (url.includes('payment-success')) {
+        setShowPayment(false);
+        Alert.alert(
+          'Pagamento Aprovado! 🎉',
+          'Sua assinatura foi ativada com sucesso. Bem-vindo ao premium!',
+          [
+            {
+              text: 'Continuar',
+              onPress: () => router.replace('/auth'),
+            },
+          ]
+        );
+      } else if (url.includes('payment-cancel')) {
+        setShowPayment(false);
+        Alert.alert(
+          'Pagamento Cancelado',
+          'O pagamento foi cancelado. Você pode tentar novamente quando quiser.',
+          [{ text: 'OK' }]
+        );
+      }
+    };
+
+    const subscription = Linking.addEventListener('url', handleDeepLink);
+
+    Linking.getInitialURL().then((url) => {
+      if (url) {
+        handleDeepLink({ url });
+      }
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, [router]);
 
   const plans = {
     monthly: {
