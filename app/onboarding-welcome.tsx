@@ -1,6 +1,5 @@
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Heart, Sparkles } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import colors from '@/constants/colors';
@@ -16,14 +15,11 @@ export default function OnboardingWelcome() {
         style={styles.gradient}
       >
         <View style={[styles.content, { paddingTop: insets.top + 40, paddingBottom: insets.bottom + 48 }]}>
-          <View style={styles.iconContainer}>
-            <View style={styles.iconCircle}>
-              <Heart size={64} color="#FFFFFF" fill="#FFFFFF" />
-            </View>
-            <View style={styles.sparkleIcon}>
-              <Sparkles size={32} color="#FFD700" fill="#FFD700" />
-            </View>
-          </View>
+          <Image
+            source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/eh54tlckxqf2lwdpbd90x' }}
+            style={styles.heroImage}
+            resizeMode="cover"
+          />
 
           <Text style={styles.title}>Bem-vindo ao{'\n'}LacNutry</Text>
           
@@ -78,24 +74,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-  iconContainer: {
-    position: 'relative' as const,
+  heroImage: {
+    width: '100%',
+    height: 280,
+    borderRadius: 16,
     marginBottom: 24,
-  },
-  iconCircle: {
-    width: 160,
-    height: 160,
-    borderRadius: 80,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    borderWidth: 3,
-    borderColor: 'rgba(255, 255, 255, 0.3)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  sparkleIcon: {
-    position: 'absolute' as const,
-    top: -8,
-    right: -8,
   },
   title: {
     fontSize: 42,
