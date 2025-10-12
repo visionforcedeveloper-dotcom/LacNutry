@@ -118,7 +118,7 @@ export default function OnboardingQuiz() {
 
           {question.id === 1 && (
             <Image
-              source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/z0ngrofo3cu7d46bih3y8' }}
+              source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/gdfqd5waxk1w8pcaslh0v' }}
               style={styles.infoImage}
               resizeMode="contain"
             />
