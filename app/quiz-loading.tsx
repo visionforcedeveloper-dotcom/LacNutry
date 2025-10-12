@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Animated } from 'react-native';
+import { View, Text, StyleSheet, Animated, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Check } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -103,6 +103,18 @@ export default function QuizLoading() {
               );
             })}
           </View>
+
+          <View style={styles.helpSection}>
+            <Image
+              source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/hhq579g3g395p655yvs2f' }}
+              style={styles.helpImage}
+              resizeMode="contain"
+            />
+            <Text style={styles.helpTitle}>O LacNutry vai te ajudar!</Text>
+            <Text style={styles.helpDescription}>
+              Com receitas personalizadas e planejamento inteligente, você terá uma vida sem desconfortos.
+            </Text>
+          </View>
         </View>
 
         <View style={[styles.footer, { paddingBottom: insets.bottom + 24 }]}>
@@ -205,5 +217,29 @@ const styles = StyleSheet.create({
     height: 4,
     backgroundColor: 'rgba(255, 255, 255, 0.3)',
     borderRadius: 2,
+  },
+  helpSection: {
+    marginTop: 48,
+    alignItems: 'center',
+    paddingHorizontal: 16,
+  },
+  helpImage: {
+    width: 280,
+    height: 200,
+    marginBottom: 24,
+  },
+  helpTitle: {
+    fontSize: 24,
+    fontWeight: '800' as const,
+    color: '#FFFFFF',
+    textAlign: 'center',
+    marginBottom: 12,
+  },
+  helpDescription: {
+    fontSize: 16,
+    fontWeight: '500' as const,
+    color: 'rgba(255, 255, 255, 0.9)',
+    textAlign: 'center',
+    lineHeight: 24,
   },
 });
