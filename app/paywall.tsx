@@ -1,10 +1,9 @@
-import { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert, Modal, ActivityIndicator, Linking } from 'react-native';
+import { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Check, X, Sparkles, ChefHat, Camera, MessageCircle, ArrowLeft } from 'lucide-react-native';
+import { Check, X, Sparkles, ChefHat, Camera, MessageCircle } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { WebView } from 'react-native-webview';
 import colors from '@/constants/colors';
 type PlanType = 'monthly' | 'annual';
 
@@ -12,48 +11,6 @@ export default function Paywall() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const [selectedPlan, setSelectedPlan] = useState<PlanType>('annual');
-  const [showPayment, setShowPayment] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const handleDeepLink = (event: { url: string }) => {
-      const url = event.url;
-      console.log('Deep link recebido:', url);
-
-      if (url.includes('payment-success')) {
-        setShowPayment(false);
-        Alert.alert(
-          'Pagamento Aprovado! 🎉',
-          'Sua assinatura foi ativada com sucesso. Bem-vindo ao premium!',
-          [
-            {
-              text: 'Continuar',
-              onPress: () => router.replace('/auth'),
-            },
-          ]
-        );
-      } else if (url.includes('payment-cancel')) {
-        setShowPayment(false);
-        Alert.alert(
-          'Pagamento Cancelado',
-          'O pagamento foi cancelado. Você pode tentar novamente quando quiser.',
-          [{ text: 'OK' }]
-        );
-      }
-    };
-
-    const subscription = Linking.addEventListener('url', handleDeepLink);
-
-    Linking.getInitialURL().then((url) => {
-      if (url) {
-        handleDeepLink({ url });
-      }
-    });
-
-    return () => {
-      subscription.remove();
-    };
-  }, [router]);
 
   const plans = {
     monthly: {
@@ -61,14 +18,12 @@ export default function Paywall() {
       period: 'mês',
       savings: null,
       pricePerMonth: 27,
-      stripeUrl: 'https://buy.stripe.com/dRm14p1v85Vu6wQ2Iw97G0a',
     },
     annual: {
       price: 97,
       period: 'ano',
       savings: 'Economize R$ 227',
       pricePerMonth: 8.08,
-      stripeUrl: 'https://buy.stripe.com/cNi4gBa1Ees07AUfvi97G0b',
     },
   };
 
@@ -96,52 +51,14 @@ export default function Paywall() {
   ];
 
   const handleSubscribe = () => {
-    setShowPayment(true);
-    setIsLoading(true);
-  };
-
-  const handleWebViewNavigationStateChange = (navState: any) => {
-    const { url } = navState;
-    console.log('WebView URL:', url);
-
-    if (url.includes('checkout.stripe.com')) {
-      setIsLoading(false);
-    }
-
-    if (url.includes('/success') || url.includes('payment-success') || url.includes('checkout/success')) {
-      console.log('Payment successful!');
-      setShowPayment(false);
-      Alert.alert(
-        'Pagamento Aprovado! 🎉',
-        'Sua assinatura foi ativada com sucesso. Bem-vindo ao premium!',
-        [
-          {
-            text: 'Continuar',
-            onPress: () => router.replace('/auth'),
-          },
-        ]
-      );
-    }
-
-    if (url.includes('/cancel') || url.includes('payment-cancel')) {
-      console.log('Payment cancelled');
-      setShowPayment(false);
-    }
-  };
-
-  const handleClosePayment = () => {
     Alert.alert(
-      'Cancelar Pagamento?',
-      'Você deseja cancelar o processo de pagamento?',
-      [
-        { text: 'Não', style: 'cancel' },
-        {
-          text: 'Sim',
-          onPress: () => setShowPayment(false),
-        },
-      ]
+      'Assinatura Premium',
+      'A funcionalidade de pagamento será implementada em breve.',
+      [{ text: 'OK' }]
     );
   };
+
+
 
   const handleSkip = () => {
     Alert.alert(
@@ -160,7 +77,6 @@ export default function Paywall() {
   };
 
   return (
-    <>
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <LinearGradient
         colors={[colors.primary, colors.primaryDark]}
@@ -300,47 +216,6 @@ export default function Paywall() {
         </View>
       </LinearGradient>
     </View>
-
-    <Modal
-      visible={showPayment}
-      animationType="slide"
-      presentationStyle="pageSheet"
-      onRequestClose={handleClosePayment}
-    >
-      <View style={styles.modalContainer}>
-        <View style={[styles.modalHeader, { paddingTop: insets.top + 16 }]}>
-          <TouchableOpacity
-            style={styles.backButton}
-            onPress={handleClosePayment}
-            activeOpacity={0.7}
-          >
-            <ArrowLeft size={24} color={colors.primary} />
-          </TouchableOpacity>
-          <Text style={styles.modalTitle}>Finalizar Pagamento</Text>
-          <View style={{ width: 40 }} />
-        </View>
-
-        {isLoading && (
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color={colors.primary} />
-            <Text style={styles.loadingText}>Carregando pagamento...</Text>
-          </View>
-        )}
-
-        <WebView
-          source={{ uri: plans[selectedPlan].stripeUrl }}
-          onNavigationStateChange={handleWebViewNavigationStateChange}
-          onLoadStart={() => setIsLoading(true)}
-          onLoadEnd={() => setIsLoading(false)}
-          style={styles.webview}
-          startInLoadingState={true}
-          javaScriptEnabled={true}
-          domStorageEnabled={true}
-          sharedCookiesEnabled={true}
-        />
-      </View>
-    </Modal>
-    </>
   );
 }
 
@@ -562,50 +437,5 @@ const styles = StyleSheet.create({
     fontWeight: '600' as const,
     color: colors.primaryDark,
     opacity: 0.7,
-  },
-  modalContainer: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingBottom: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E5E5',
-    backgroundColor: '#FFFFFF',
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#F5F5F5',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: '700' as const,
-    color: '#1A1A1A',
-  },
-  webview: {
-    flex: 1,
-  },
-  loadingContainer: {
-    position: 'absolute',
-    top: '50%',
-    left: 0,
-    right: 0,
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 10,
-  },
-  loadingText: {
-    marginTop: 12,
-    fontSize: 16,
-    color: '#666666',
-    fontWeight: '600' as const,
   },
 });
