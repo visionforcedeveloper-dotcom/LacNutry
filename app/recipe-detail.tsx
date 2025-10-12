@@ -11,7 +11,6 @@ import {
 } from 'react-native';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { ArrowLeft, Clock, Flame, Heart, Users, ChefHat } from 'lucide-react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Colors from '@/constants/colors';
 import { trpc } from '@/lib/trpc';
@@ -77,33 +76,28 @@ export default function RecipeDetailScreen() {
     <View style={styles.container}>
       <Stack.Screen options={{ headerShown: false }} />
       
-      <View style={[styles.header, { paddingTop: insets.top }]}>
-        <LinearGradient
-          colors={['rgba(255,255,255,1)', 'rgba(255,255,255,0.95)']}
-          style={styles.headerGradient}
-        >
-          <View style={styles.headerContent}>
-            <TouchableOpacity
-              style={styles.headerButton}
-              onPress={() => router.back()}
-              activeOpacity={0.7}
-            >
-              <ArrowLeft size={24} color={Colors.text.primary} strokeWidth={2.5} />
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.headerButton}
-              onPress={() => toggleFavorite(recipe.id)}
-              activeOpacity={0.7}
-            >
-              <Heart
-                size={24}
-                color={isFavorite(recipe.id) ? '#FF6B6B' : Colors.text.primary}
-                strokeWidth={2.5}
-                fill={isFavorite(recipe.id) ? '#FF6B6B' : 'transparent'}
-              />
-            </TouchableOpacity>
-          </View>
-        </LinearGradient>
+      <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
+        <View style={styles.headerContent}>
+          <TouchableOpacity
+            style={styles.headerButton}
+            onPress={() => router.back()}
+            activeOpacity={0.7}
+          >
+            <ArrowLeft size={24} color={Colors.text.primary} strokeWidth={2.5} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.headerButton}
+            onPress={() => toggleFavorite(recipe.id)}
+            activeOpacity={0.7}
+          >
+            <Heart
+              size={24}
+              color={isFavorite(recipe.id) ? '#FF6B6B' : Colors.text.primary}
+              strokeWidth={2.5}
+              fill={isFavorite(recipe.id) ? '#FF6B6B' : 'transparent'}
+            />
+          </TouchableOpacity>
+        </View>
       </View>
 
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
@@ -264,10 +258,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     zIndex: 10,
-  },
-  headerGradient: {
     paddingHorizontal: 20,
-    paddingVertical: 12,
   },
   headerContent: {
     flexDirection: 'row' as const,
