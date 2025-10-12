@@ -10,16 +10,17 @@ export default function OnboardingWelcome() {
 
   return (
     <View style={styles.container}>
-      <Image
-        source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/eh54tlckxqf2lwdpbd90x' }}
-        style={styles.backgroundImage}
-        resizeMode="contain"
-      />
       <LinearGradient
-        colors={['rgba(0,0,0,0.3)', 'rgba(0,0,0,0.6)']}
-        style={styles.overlay}
+        colors={[colors.primary, colors.primaryDark]}
+        style={styles.gradient}
       >
         <View style={[styles.content, { paddingTop: insets.top + 40, paddingBottom: insets.bottom + 48 }]}>
+          <Image
+            source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/eh54tlckxqf2lwdpbd90x' }}
+            style={styles.heroImage}
+            resizeMode="cover"
+          />
+
           <Text style={styles.title}>Bem-vindo ao{'\n'}LacNutry</Text>
           
           <Text style={styles.subtitle}>
@@ -63,16 +64,8 @@ export default function OnboardingWelcome() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.primary,
   },
-  backgroundImage: {
-    position: 'absolute',
-    width: '100%',
-    height: '100%',
-    top: 0,
-    left: 0,
-  },
-  overlay: {
+  gradient: {
     flex: 1,
   },
   content: {
@@ -80,6 +73,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     alignItems: 'center',
     justifyContent: 'flex-start',
+  },
+  heroImage: {
+    width: '100%',
+    height: 200,
+    borderRadius: 16,
+    marginBottom: 20,
   },
   title: {
     fontSize: 28,
