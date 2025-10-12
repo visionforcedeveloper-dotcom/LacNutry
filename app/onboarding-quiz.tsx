@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Animated } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Animated, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import { ChevronLeft, ChevronRight } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -114,6 +114,14 @@ export default function OnboardingQuiz() {
 
           {question.subtitle && (
             <Text style={styles.subtitle}>{question.subtitle}</Text>
+          )}
+
+          {question.id === 1 && (
+            <Image
+              source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/z0ngrofo3cu7d46bih3y8' }}
+              style={styles.infoImage}
+              resizeMode="contain"
+            />
           )}
 
           {question.type === 'text' && (
@@ -323,5 +331,11 @@ const styles = StyleSheet.create({
   },
   nextButtonDisabled: {
     opacity: 0.5,
+  },
+  infoImage: {
+    width: '100%',
+    height: 300,
+    marginTop: 24,
+    borderRadius: 16,
   },
 });
