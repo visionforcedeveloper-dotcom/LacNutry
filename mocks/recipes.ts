@@ -83,7 +83,7 @@ export const featuredRecipes: Recipe[] = [
     id: '2',
     title: 'Risoto de Cogumelos Cremoso',
     description: 'Risoto cremoso preparado com creme vegetal e cogumelos frescos',
-    image: 'https://images.unsplash.com/photo-1476124369491-c4ca2e0d9160?w=800&q=80',
+    image: 'https://pt.petitchef.com/imgupl/recipe/risoto-cremoso-de-cogumelos--lg-459739p721217.webp',
     prepTime: 35,
     servings: 4,
     difficulty: 'Médio',
