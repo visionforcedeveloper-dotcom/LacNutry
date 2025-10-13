@@ -118,7 +118,7 @@ export default function OnboardingQuiz() {
 
           {question.id === 1 && (
             <Image
-              source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/otd7zdjwl99lifgn9n1m7' }}
+              source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/x872g8x26a2cajpoqd7ae' }}
               style={styles.infoImage}
               resizeMode="contain"
             />
@@ -334,7 +334,7 @@ const styles = StyleSheet.create({
   },
   infoImage: {
     width: '100%',
-    height: 300,
+    height: 400,
     marginTop: 24,
     borderRadius: 16,
   },
