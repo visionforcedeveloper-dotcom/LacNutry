@@ -124,6 +124,14 @@ export default function OnboardingQuiz() {
             />
           )}
 
+          {question.id === 10 && (
+            <Image
+              source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/2iqs7zypg445x8o63l7oo' }}
+              style={styles.fullScreenImage}
+              resizeMode="cover"
+            />
+          )}
+
           {question.type === 'text' && (
             <TextInput
               style={styles.textInput}
@@ -337,5 +345,11 @@ const styles = StyleSheet.create({
     height: 400,
     marginTop: 24,
     borderRadius: 16,
+  },
+  fullScreenImage: {
+    width: '100%',
+    height: 500,
+    marginTop: 24,
+    borderRadius: 0,
   },
 });
