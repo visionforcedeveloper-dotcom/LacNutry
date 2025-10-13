@@ -132,14 +132,6 @@ export default function OnboardingQuiz() {
             />
           )}
 
-          {question.id === 11 && (
-            <Image
-              source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/xhsr1xrkpmwu1rkw1t408' }}
-              style={styles.fullScreenImage}
-              resizeMode="cover"
-            />
-          )}
-
           {question.type === 'text' && (
             <TextInput
               style={styles.textInput}
