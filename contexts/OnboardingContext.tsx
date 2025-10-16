@@ -20,21 +20,29 @@ export const [OnboardingProvider, useOnboarding] = createContextHook(() => {
     
     const loadOnboardingStatus = async () => {
       try {
+        console.log('[Onboarding] Loading onboarding status...');
         const [completed, answers] = await Promise.all([
           AsyncStorage.getItem(ONBOARDING_KEY),
           AsyncStorage.getItem(QUIZ_ANSWERS_KEY),
         ]);
         
         if (mounted) {
+          console.log('[Onboarding] Completed:', completed === 'true');
           setIsOnboardingCompleted(completed === 'true');
           if (answers) {
-            setQuizAnswers(JSON.parse(answers));
+            try {
+              setQuizAnswers(JSON.parse(answers));
+            } catch (parseError) {
+              console.error('[Onboarding] Error parsing quiz answers:', parseError);
+              setQuizAnswers({});
+            }
           }
         }
       } catch (error) {
-        console.error('Error loading onboarding status:', error);
+        console.error('[Onboarding] Error loading onboarding status:', error);
         if (mounted) {
           setIsOnboardingCompleted(false);
+          setQuizAnswers({});
         }
       } finally {
         if (mounted) {

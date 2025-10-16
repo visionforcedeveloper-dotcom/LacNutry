@@ -15,14 +15,24 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
     
     const initAuth = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
+        console.log('[Auth] Initializing authentication...');
+        const { data: { session }, error } = await supabase.auth.getSession();
+        if (error) {
+          console.error('[Auth] Error getting session:', error);
+        }
         if (mounted) {
+          console.log('[Auth] Session loaded:', !!session);
           setSession(session);
           setUser(session?.user ?? null);
           setIsAuthenticated(!!session);
         }
       } catch (error) {
-        console.error('Error getting session:', error);
+        console.error('[Auth] Exception during auth init:', error);
+        if (mounted) {
+          setSession(null);
+          setUser(null);
+          setIsAuthenticated(false);
+        }
       } finally {
         if (mounted) {
           setLoading(false);
