@@ -10,11 +10,14 @@ const ONBOARDING_KEY = '@lacnutry_onboarding_completed';
 const QUIZ_ANSWERS_KEY = '@lacnutry_quiz_answers';
 
 export const [OnboardingProvider, useOnboarding] = createContextHook(() => {
-  const [isOnboardingCompleted, setIsOnboardingCompleted] = useState<boolean | null>(null);
+  const [isOnboardingCompleted, setIsOnboardingCompleted] = useState<boolean>(false);
   const [quizAnswers, setQuizAnswers] = useState<QuizAnswers>({});
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
+    let mounted = true;
+    setIsLoading(true);
+    
     const loadOnboardingStatus = async () => {
       try {
         const [completed, answers] = await Promise.all([
@@ -22,19 +25,29 @@ export const [OnboardingProvider, useOnboarding] = createContextHook(() => {
           AsyncStorage.getItem(QUIZ_ANSWERS_KEY),
         ]);
         
-        setIsOnboardingCompleted(completed === 'true');
-        if (answers) {
-          setQuizAnswers(JSON.parse(answers));
+        if (mounted) {
+          setIsOnboardingCompleted(completed === 'true');
+          if (answers) {
+            setQuizAnswers(JSON.parse(answers));
+          }
         }
       } catch (error) {
         console.error('Error loading onboarding status:', error);
-        setIsOnboardingCompleted(false);
+        if (mounted) {
+          setIsOnboardingCompleted(false);
+        }
       } finally {
-        setIsLoading(false);
+        if (mounted) {
+          setIsLoading(false);
+        }
       }
     };
 
     loadOnboardingStatus();
+    
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   const completeOnboarding = useCallback(async (answers: QuizAnswers) => {

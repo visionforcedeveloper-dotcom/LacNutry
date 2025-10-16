@@ -33,7 +33,7 @@ function RootLayoutNav() {
     } else if (isAuthenticated && !inTabs) {
       router.replace('/(tabs)');
     }
-  }, [isOnboardingCompleted, isAuthenticated, onboardingLoading, authLoading]);
+  }, [isOnboardingCompleted, isAuthenticated, onboardingLoading, authLoading, segments, router]);
 
   return (
     <Stack screenOptions={{ headerBackTitle: 'Voltar' }}>
@@ -49,9 +49,24 @@ function RootLayoutNav() {
 }
 
 export default function RootLayout() {
+  const [isReady, setIsReady] = React.useState(false);
+  
   useEffect(() => {
-    SplashScreen.hideAsync();
+    const prepare = async () => {
+      try {
+        await new Promise(resolve => setTimeout(resolve, 100));
+      } finally {
+        setIsReady(true);
+        SplashScreen.hideAsync();
+      }
+    };
+    
+    prepare();
   }, []);
+  
+  if (!isReady) {
+    return null;
+  }
 
   return (
     <trpc.Provider client={trpcClient} queryClient={queryClient}>
