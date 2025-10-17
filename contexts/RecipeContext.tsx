@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import createContextHook from '@nkzw/create-context-hook';
 import { trpc } from '@/lib/trpc';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -32,22 +32,20 @@ export const [RecipeProvider, useRecipes] = createContextHook(() => {
 
   const isFavorite = useCallback((recipeId: string) => favorites.includes(recipeId), [favorites]);
 
-  return useMemo(() => {
-    const recipes = recipesQuery.data?.recipes || [];
-    const categories = recipesQuery.data?.categories || [];
+  const recipes = recipesQuery.data?.recipes || [];
+  const categories = recipesQuery.data?.categories || [];
 
-    return {
-      recipes,
-      categories,
-      searchQuery,
-      setSearchQuery,
-      selectedCategory,
-      setSelectedCategory,
-      favorites,
-      toggleFavorite,
-      isFavorite,
-      isLoading: recipesQuery.isLoading,
-      error: recipesQuery.error,
-    };
-  }, [recipesQuery.data, searchQuery, selectedCategory, favorites, toggleFavorite, isFavorite, recipesQuery.isLoading, recipesQuery.error]);
+  return {
+    recipes,
+    categories,
+    searchQuery,
+    setSearchQuery,
+    selectedCategory,
+    setSelectedCategory,
+    favorites,
+    toggleFavorite,
+    isFavorite,
+    isLoading: recipesQuery.isLoading,
+    error: recipesQuery.error,
+  };
 });

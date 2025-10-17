@@ -1,5 +1,5 @@
 import createContextHook from '@nkzw/create-context-hook';
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Platform, Alert } from 'react-native';
 import { useAuth } from './AuthContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -35,7 +35,7 @@ export const [PurchaseProvider, usePurchase] = createContextHook(() => {
     error: null,
   });
 
-  const mockProducts: PurchaseProduct[] = useMemo(() => [
+  const mockProducts: PurchaseProduct[] = [
     {
       productId: 'premium_acesso_monthly',
       title: 'Premium Mensal',
@@ -52,7 +52,7 @@ export const [PurchaseProvider, usePurchase] = createContextHook(() => {
       priceAmountMicros: 97000000,
       priceCurrencyCode: 'BRL',
     },
-  ], []);
+  ];
 
   const checkPremiumStatus = useCallback(async () => {
     try {
@@ -100,7 +100,7 @@ export const [PurchaseProvider, usePurchase] = createContextHook(() => {
     console.log('[Purchase] Initializing purchase system...');
     setState(prev => ({ ...prev, products: mockProducts }));
     checkPremiumStatus();
-  }, [checkPremiumStatus, mockProducts]);
+  }, [checkPremiumStatus]);
 
   const purchaseProduct = useCallback(async (productId: ProductId) => {
     try {
@@ -207,16 +207,13 @@ export const [PurchaseProvider, usePurchase] = createContextHook(() => {
     }
   }, [checkPremiumStatus, state.isPremium]);
 
-  return useMemo(
-    () => ({
-      isPremium: state.isPremium,
-      isLoading: state.isLoading,
-      products: state.products,
-      error: state.error,
-      purchaseProduct,
-      restorePurchases,
-      checkPremiumStatus,
-    }),
-    [state, purchaseProduct, restorePurchases, checkPremiumStatus]
-  );
+  return {
+    isPremium: state.isPremium,
+    isLoading: state.isLoading,
+    products: state.products,
+    error: state.error,
+    purchaseProduct,
+    restorePurchases,
+    checkPremiumStatus,
+  };
 });

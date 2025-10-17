@@ -1,5 +1,5 @@
 import createContextHook from '@nkzw/create-context-hook';
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Session, User } from '@supabase/supabase-js';
 
@@ -83,17 +83,14 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
     console.log('[Auth] Subscription completed for user:', user?.id);
   }, [user]);
 
-  return useMemo(
-    () => ({
-      session,
-      user,
-      loading,
-      isAuthenticated,
-      signUp,
-      signIn,
-      signOut,
-      completeSubscription,
-    }),
-    [session, user, loading, isAuthenticated, signUp, signIn, signOut, completeSubscription]
-  );
+  return {
+    session,
+    user,
+    loading,
+    isAuthenticated,
+    signUp,
+    signIn,
+    signOut,
+    completeSubscription,
+  };
 });

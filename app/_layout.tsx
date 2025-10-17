@@ -73,18 +73,19 @@ function RootLayoutNav() {
   useEffect(() => {
     if (onboardingLoading || authLoading) return;
 
-    const inOnboarding = segments[0] === 'onboarding-welcome' || segments[0] === 'onboarding-quiz';
-    const inLoading = segments[0] === 'quiz-loading';
-    const inPaywall = segments[0] === 'paywall';
-    const inAuth = segments[0] === 'auth';
-    const inTabs = segments[0] === '(tabs)';
+    const currentSegment = segments[0];
+    const inOnboarding = currentSegment === 'onboarding-welcome' || currentSegment === 'onboarding-quiz';
+    const inLoading = currentSegment === 'quiz-loading';
+    const inPaywall = currentSegment === 'paywall';
+    const inAuth = currentSegment === 'auth';
+    const inTabs = currentSegment === '(tabs)';
 
     if (!isOnboardingCompleted && !inOnboarding && !inLoading && !inPaywall && !inAuth) {
-      router.replace('/onboarding-welcome');
-    } else if (isAuthenticated && !inTabs) {
-      router.replace('/(tabs)');
+      setTimeout(() => router.replace('/onboarding-welcome'), 0);
+    } else if (isAuthenticated && !inTabs && isOnboardingCompleted) {
+      setTimeout(() => router.replace('/(tabs)'), 0);
     }
-  }, [isOnboardingCompleted, isAuthenticated, onboardingLoading, authLoading, segments, router]);
+  }, [isOnboardingCompleted, isAuthenticated, onboardingLoading, authLoading]);
 
   return (
     <Stack screenOptions={{ headerBackTitle: 'Voltar' }}>

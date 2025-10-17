@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import createContextHook from '@nkzw/create-context-hook';
 
@@ -88,12 +88,12 @@ export const [OnboardingProvider, useOnboarding] = createContextHook(() => {
     return (quizAnswers[1] as string) || 'Usuário';
   }, [quizAnswers]);
 
-  return useMemo(() => ({
+  return {
     isOnboardingCompleted,
     isLoading,
     quizAnswers,
     completeOnboarding,
     resetOnboarding,
     getUserName,
-  }), [isOnboardingCompleted, isLoading, quizAnswers, completeOnboarding, resetOnboarding, getUserName]);
+  };
 });
