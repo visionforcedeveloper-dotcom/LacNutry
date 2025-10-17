@@ -1,16 +1,19 @@
 import { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Check, X, Sparkles, ChefHat, Camera, MessageCircle } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import colors from '@/constants/colors';
+import { usePurchase } from '@/contexts/PurchaseContext';
+import type { ProductId } from '@/contexts/PurchaseContext';
 type PlanType = 'monthly' | 'annual';
 
 export default function Paywall() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const [selectedPlan, setSelectedPlan] = useState<PlanType>('annual');
+  const { purchaseProduct, isLoading, restorePurchases } = usePurchase();
 
   const plans = {
     monthly: {
@@ -50,11 +53,44 @@ export default function Paywall() {
     },
   ];
 
-  const handleSubscribe = () => {
+  const handleSubscribe = async () => {
+    try {
+      const productId: ProductId = selectedPlan === 'annual' 
+        ? 'premium_acesso_annual' 
+        : 'premium_acesso_monthly';
+      
+      console.log('[Paywall] Initiating purchase for:', productId);
+      
+      const result = await purchaseProduct(productId);
+      
+      if (result.success) {
+        console.log('[Paywall] Purchase successful, navigating to home...');
+        router.replace('/');
+      } else {
+        console.log('[Paywall] Purchase failed:', result.error);
+      }
+    } catch (error) {
+      console.error('[Paywall] Error during subscription:', error);
+      Alert.alert(
+        'Erro',
+        'Não foi possível processar sua assinatura. Tente novamente.'
+      );
+    }
+  };
+
+  const handleRestorePurchases = () => {
     Alert.alert(
-      'Assinatura Premium',
-      'A funcionalidade de pagamento será implementada em breve.',
-      [{ text: 'OK' }]
+      'Restaurar Compras',
+      'Deseja restaurar suas compras anteriores?',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: 'Restaurar',
+          onPress: async () => {
+            await restorePurchases();
+          },
+        },
+      ]
     );
   };
 
@@ -197,21 +233,39 @@ export default function Paywall() {
 
         <View style={[styles.footer, { paddingBottom: insets.bottom + 16 }]}>
           <TouchableOpacity
-            style={styles.subscribeButton}
+            style={[styles.subscribeButton, isLoading && styles.subscribeButtonDisabled]}
             onPress={handleSubscribe}
             activeOpacity={0.9}
+            disabled={isLoading}
           >
             <LinearGradient
               colors={['#FFFFFF', '#F0F0F0']}
               style={styles.subscribeButtonGradient}
             >
-              <Text style={styles.subscribeButtonText}>
-                Começar 3 dias grátis
-              </Text>
-              <Text style={styles.subscribeButtonSubtext}>
-                Depois R$ {plans[selectedPlan].price}/{plans[selectedPlan].period}
-              </Text>
+              {isLoading ? (
+                <View style={styles.loadingContainer}>
+                  <ActivityIndicator size="small" color={colors.primary} />
+                  <Text style={styles.subscribeButtonText}>Processando...</Text>
+                </View>
+              ) : (
+                <>
+                  <Text style={styles.subscribeButtonText}>
+                    Começar 3 dias grátis
+                  </Text>
+                  <Text style={styles.subscribeButtonSubtext}>
+                    Depois R$ {plans[selectedPlan].price}/{plans[selectedPlan].period}
+                  </Text>
+                </>
+              )}
             </LinearGradient>
+          </TouchableOpacity>
+          
+          <TouchableOpacity
+            style={styles.restoreButton}
+            onPress={handleRestorePurchases}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.restoreButtonText}>Restaurar Compras</Text>
           </TouchableOpacity>
         </View>
       </LinearGradient>
@@ -437,5 +491,24 @@ const styles = StyleSheet.create({
     fontWeight: '600' as const,
     color: colors.primaryDark,
     opacity: 0.7,
+  },
+  subscribeButtonDisabled: {
+    opacity: 0.6,
+  },
+  loadingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  restoreButton: {
+    marginTop: 16,
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
+  restoreButtonText: {
+    fontSize: 14,
+    fontWeight: '600' as const,
+    color: 'rgba(255, 255, 255, 0.9)',
+    textDecorationLine: 'underline',
   },
 });

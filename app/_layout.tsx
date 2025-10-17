@@ -9,6 +9,7 @@ import { trpc, trpcClient } from '@/lib/trpc';
 import { RecipeProvider } from '@/contexts/RecipeContext';
 import { OnboardingProvider, useOnboarding } from '@/contexts/OnboardingContext';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
+import { PurchaseProvider } from '@/contexts/PurchaseContext';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -123,14 +124,16 @@ export default function RootLayout() {
       <trpc.Provider client={trpcClient} queryClient={queryClient}>
         <QueryClientProvider client={queryClient}>
           <AuthProvider>
-            <OnboardingProvider>
-              <RecipeProvider>
-                <GestureHandlerRootView style={{ flex: 1 }}>
-                  <StatusBar style="light" />
-                  <RootLayoutNav />
-                </GestureHandlerRootView>
-              </RecipeProvider>
-            </OnboardingProvider>
+            <PurchaseProvider>
+              <OnboardingProvider>
+                <RecipeProvider>
+                  <GestureHandlerRootView style={{ flex: 1 }}>
+                    <StatusBar style="light" />
+                    <RootLayoutNav />
+                  </GestureHandlerRootView>
+                </RecipeProvider>
+              </OnboardingProvider>
+            </PurchaseProvider>
           </AuthProvider>
         </QueryClientProvider>
       </trpc.Provider>

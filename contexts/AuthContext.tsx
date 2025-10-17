@@ -80,8 +80,8 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
   }, []);
 
   const completeSubscription = useCallback(async () => {
-    console.log('Subscription completed');
-  }, []);
+    console.log('[Auth] Subscription completed for user:', user?.id);
+  }, [user]);
 
   return useMemo(
     () => ({
